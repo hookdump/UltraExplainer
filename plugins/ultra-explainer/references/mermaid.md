@@ -20,7 +20,7 @@ Use Mermaid when the diagram has **real topology that you'd otherwise position b
 Do **NOT** use Mermaid for:
 
 - **Straight sequences** — `A → B → C → D` with no branching. Build a flow strip out of `.ux-node` cards plus the connector engine (`.ux-graph` + `script.ux-edges`), or a `.ux-spine` rail. These re-theme live on toggle; Mermaid does not.
-- **Dashboards / charts** — use `.ux-kpis`, `.ux-bars`, `.ux-donut`, `.ux-linechart`.
+- **Dashboards / charts** — use `.ux-kpis`, `.ux-bars`, `.ux-linechart`, `.ux-matrix`.
 - **Tables** — use `.ux-table`.
 - **Timelines** — use `.ux-timeline`.
 - **Custom illustrations** — hand-author SVG.

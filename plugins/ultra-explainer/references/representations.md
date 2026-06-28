@@ -102,7 +102,7 @@ module coupling, co-change, confusion matrix. Reorder rows/cols to surface clust
 state, class) where hand-placement is impractical. Theme it to the active language — never default
 Mermaid colors.
 **Implements with:** `.ux-diagram-shell` → `.ux-mermaid-wrap` → `.ux-mermaid-canvas` +
-`.ux-zoom-controls` / `.ux-zoom-label`. Mermaid source goes in a `<script type="text/plain">`.
+`.ux-zoom-controls` / `.ux-zoom-label`. Mermaid source goes in a `<pre class="mermaid">` (or `<div class="mermaid">`) inside `.ux-mermaid-canvas`.
 
 ### Annotated diff + verdict (from real git diff)
 **When:** a code change / PR — 2–3 decisive hunks, plain-language behavioral delta, file:line +
@@ -206,7 +206,7 @@ prev/next/reset buttons (+ arrow keys), `.ux-codeblock` with `.l` lines that get
 **When:** a system behaves differently across discrete configs, or a guided argument transforms
 one persistent visual as the reader scrolls. Both drive the same shared `update()`.
 **Implements with:** `.ux-seg[data-scenario-ctl]` buttons set `data-scenario` on a
-`data-target`; CSS attribute selectors do the visual swap, `[data-step-show]` toggles visibility,
+`data-target`; CSS attribute selectors on `[data-scenario="…"]` do the visual swap,
 and `Ultra.redrawGraphs()` re-routes any graphs. *(Scroll-driven scrollytelling controller is
 spec'd but not wired — see GAPS.)*
 
