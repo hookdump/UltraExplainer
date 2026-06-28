@@ -149,7 +149,7 @@ Route on the cognitive **job** and the **data shape**, not the content type. Man
 - **Truth outranks beauty and craft.** Anchor or omit; hedge inferred/assumed content; never invent layers, symmetry, edges, or rationale. Interactive ranges/functions are anchored or stamped "illustrative model."
 - **One language per page, chosen on the merits and recorded.** It must pass the squint test. Glow is Luminous-only, routed through `--fx-*` so `data-fx="flat"` cleanly removes it; no continuous breathing/pulsing on static content.
 - **No horizontal page scroll.** `min-width:0` on grid/flex children; wide content (diffs, tables, Mermaid) scrolls inside its own `overflow-x:auto` container. Verify at 360px.
-- **Both themes look composed.** Light is retuned, not inverted. Respect `prefers-reduced-motion` and `prefers-color-scheme`; keep keyboard focus visible; print-safe.
+- **Both themes look composed.** Light is retuned, not inverted. The page opens in its chosen theme and the reader can toggle (persisted per preset); respect `prefers-reduced-motion`; keep keyboard focus visible; print-safe.
 - **Components consume semantic + `--fx-*` tokens only — never hex.** New looks come from theme packs, not inline colors.
 - **Never define a page-level `.node` class** — Mermaid uses it internally. All UltraExplainer classes are `.ux-` prefixed.
 - **Observe before delivering.** Render the page, look at it, fix what's wrong. Don't assert what you didn't measure.

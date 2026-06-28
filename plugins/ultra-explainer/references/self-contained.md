@@ -47,7 +47,7 @@ The body must never scroll sideways — one blown-out child produces a page-wide
 
 - Column helpers collapse to one column on narrow viewports; `.ux-kpis`/`.ux-cols-auto` reflow with `auto-fit` + a `minmax` floor.
 - Global `:focus-visible` outline. Keep interactive elements real and focusable (`<button>`, `<a>`, `<summary>`, `<input>`); the switcher, tabs, steppers and segmented controls are real `<button>`s — don't replace them with click-handled `<div>`s.
-- `prefers-reduced-motion` disables the particle field, beam drift, and autoplay. `prefers-color-scheme` seeds the initial theme. A `@media print` path hides chrome and forces a light, ink-friendly page.
+- `prefers-reduced-motion` disables the particle field, beam drift, and autoplay. The page opens in the design language's chosen theme (the directive's `theme`); the reader's manual night/day toggle is then persisted per preset (`ux-theme-<preset>`) — it deliberately does **not** force-follow the OS scheme, so a Terminal page stays dark on a light OS. A `@media print` path hides chrome and forces a light, ink-friendly page.
 
 ## The verification loop — OBSERVE before you ship
 

@@ -39,6 +39,7 @@
   --good: #0f9d58; --warn: #b7791f; --bad: #d23842;
   --good-soft: rgba(15,157,88,0.10); --warn-soft: rgba(183,121,31,0.10); --bad-soft: rgba(210,56,66,0.09);
   --meta: #7c3aed;                 /* rare structural accent (git glyph, etc.) */
+  --meta-soft: color-mix(in srgb, var(--meta) 12%, transparent);
   --edge: rgba(20,28,46,0.32);     /* default connector stroke */
   --code-bg: #0e1422; --code-text: #e7edf6;
   --tok-key: #c084fc; --tok-str: #6ee7a8; --tok-com: #7b88a1; --tok-fn: #67c0ff; --tok-num: #f0a868;
@@ -75,6 +76,8 @@ body {
 }
 a { color: var(--accent); text-underline-offset: 2px; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+/* narrow screens: clear the fixed top-right theme/glow toggle so a long kicker never runs under it */
+@media (max-width: 600px) { body { padding-top: 64px; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; } }
 @media print { body { padding: 0; background: #fff; color: #000; } .ux-fxbar, .ux-field, .ux-nav { display: none !important; } .ux-details { open: true; } }
 
@@ -810,19 +813,22 @@ code, .ux-code-inline { font-family: var(--font-mono); font-size: 0.86em; backgr
 
 <script>
 /* ==========================================================================
-   AURORA — UltraExplainer behavior (canonical, self-contained).
-   Inline the relevant parts into generated pages. Everything auto-inits and
-   is a no-op when its target DOM is absent, so it is safe to include wholesale.
+   UltraExplainer — runtime behavior (canonical, self-contained).
+   Inlined into generated pages by build.mjs. Everything auto-inits and is a
+   no-op when its target DOM is absent, so it is safe to include wholesale.
 
-   IMPORTANT — put this FOUC-free resolver in <head> BEFORE the stylesheet so
-   the theme/glow choice is applied before first paint:
+   IMPORTANT — build.mjs injects a FOUC-free resolver in <head> BEFORE the
+   stylesheet so the theme/glow choice is applied before first paint. It seeds
+   from the directive's chosen theme (each design language has a natural one),
+   then honors the reader's persisted toggle, per preset:
 
      <script>(function(){var d=document.documentElement,s=localStorage;
-       var t=s.getItem('ux-theme');
-       d.dataset.theme=(t==='light'||t==='dark')?t:(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-       d.dataset.fx=s.getItem('ux-fx')==='flat'?'flat':'glow';})();<\/script>
+       d.dataset.themePreset=PRESET;
+       var t=s.getItem('ux-theme-'+PRESET);
+       d.dataset.theme=(t==='light'||t==='dark')?t:DIRECTIVE_THEME;
+       d.dataset.fx=s.getItem('ux-fx')==='flat'?'flat':DIRECTIVE_FX;})();<\/script>
 
-   The rest of this file can load at the end of <body>.
+   The rest of this file loads at the end of <body>.
    ========================================================================== */
 (function () {
   "use strict";

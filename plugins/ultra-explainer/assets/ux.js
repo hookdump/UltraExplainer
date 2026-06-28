@@ -1,17 +1,20 @@
 /* ==========================================================================
-   AURORA — UltraExplainer behavior (canonical, self-contained).
-   Inline the relevant parts into generated pages. Everything auto-inits and
-   is a no-op when its target DOM is absent, so it is safe to include wholesale.
+   UltraExplainer — runtime behavior (canonical, self-contained).
+   Inlined into generated pages by build.mjs. Everything auto-inits and is a
+   no-op when its target DOM is absent, so it is safe to include wholesale.
 
-   IMPORTANT — put this FOUC-free resolver in <head> BEFORE the stylesheet so
-   the theme/glow choice is applied before first paint:
+   IMPORTANT — build.mjs injects a FOUC-free resolver in <head> BEFORE the
+   stylesheet so the theme/glow choice is applied before first paint. It seeds
+   from the directive's chosen theme (each design language has a natural one),
+   then honors the reader's persisted toggle, per preset:
 
      <script>(function(){var d=document.documentElement,s=localStorage;
-       var t=s.getItem('ux-theme');
-       d.dataset.theme=(t==='light'||t==='dark')?t:(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-       d.dataset.fx=s.getItem('ux-fx')==='flat'?'flat':'glow';})();<\/script>
+       d.dataset.themePreset=PRESET;
+       var t=s.getItem('ux-theme-'+PRESET);
+       d.dataset.theme=(t==='light'||t==='dark')?t:DIRECTIVE_THEME;
+       d.dataset.fx=s.getItem('ux-fx')==='flat'?'flat':DIRECTIVE_FX;})();<\/script>
 
-   The rest of this file can load at the end of <body>.
+   The rest of this file loads at the end of <body>.
    ========================================================================== */
 (function () {
   "use strict";
