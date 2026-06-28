@@ -1,0 +1,46 @@
+{
+  "name": "ultraexplainer",
+  "owner": {
+    "name": "hookdump",
+    "url": "https://github.com/hookdump"
+  },
+  "metadata": {
+    "description": "UltraExplainer — generate strikingly clear, self-contained HTML visual explanations from code, systems, diffs, and plans.",
+    "version": "0.1.0",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "ultra-explainer",
+      "source": "./plugins/ultra-explainer",
+      "description": "Turn code, systems, diffs, and plans into strikingly clear self-contained HTML — node-edge graphs with routed arrows, annotated diffs, dashboards, timelines, slides, and custom SVG illustrations. Futuristic 'Aurora' design system with an optional glow layer and light/dark themes.",
+      "version": "0.1.0",
+      "author": {
+        "name": "hookdump"
+      },
+      "homepage": "https://github.com/hookdump/UltraExplainer",
+      "repository": "https://github.com/hookdump/UltraExplainer",
+      "license": "MIT",
+      "keywords": [
+        "diagrams",
+        "visualization",
+        "html",
+        "diff-review",
+        "architecture",
+        "slides",
+        "mermaid",
+        "dashboard"
+      ],
+      "category": "visualization",
+      "tags": [
+        "diagrams",
+        "html-generation",
+        "code-review",
+        "architecture",
+        "slides",
+        "dashboards",
+        "mermaid"
+      ]
+    }
+  ]
+}

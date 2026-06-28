@@ -1,0 +1,48 @@
+<!--ux: {"title":"Diff Review — processor.ts (UltraExplainer)"} -->
+<div class="ux-wrap ux-wrap--narrow">
+
+  <header>
+    <span class="ux-kicker">Diff review · PR #482</span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">One guard turns a silent parse crash into a <span class="lit">real HTTP error</span>.</h1>
+    <p class="ux-lede ux-rise" style="--i:1">The change is three lines, but it closes a failure path: a non-2xx response used to fall through to <code>res.json()</code> and throw an opaque syntax error. Now the offending request id surfaces at the boundary.</p>
+  </header>
+
+  <section class="ux-section">
+    <div class="ux-section-title">Change under review</div>
+    <div class="ux-diff ux-rise" style="--i:0">
+      <div class="ux-diff__bar">
+        <span class="ux-diff__branch" aria-hidden="true">⎇</span>
+        <span class="ux-diff__file">src/api/processor.ts</span>
+        <span class="ux-diff__tally"><span class="add">+3</span><span class="del">−1</span></span>
+      </div>
+      <div class="ux-diff__scroll">
+        <div class="ux-diff__row"><div class="ux-diff__ln">79</div><div class="ux-diff__gut"></div><div class="ux-diff__code"><span class="tok-k">async function</span> <span class="tok-f">fetchData</span>(id: <span class="tok-k">string</span>) {</div></div>
+        <div class="ux-diff__row ux-diff__row--del"><div class="ux-diff__ln"></div><div class="ux-diff__gut"></div><div class="ux-diff__code">  <span class="tok-k">const</span> res = <span class="tok-k">await</span> fetch(<span class="tok-s">`/api/${id}`</span>);</div></div>
+        <div class="ux-diff__row ux-diff__row--del"><div class="ux-diff__ln"></div><div class="ux-diff__gut"></div><div class="ux-diff__code">  <span class="tok-k">return</span> res.json();</div></div>
+        <div class="ux-diff__row ux-diff__row--add"><div class="ux-diff__ln">80</div><div class="ux-diff__gut"></div><div class="ux-diff__code">  <span class="tok-k">const</span> res = <span class="tok-k">await</span> fetch(<span class="tok-s">`/api/${id}`</span>);</div></div>
+        <div class="ux-diff__row ux-diff__row--add"><div class="ux-diff__ln">81</div><div class="ux-diff__gut"></div><div class="ux-diff__code">  <span class="tok-k">if</span> (!res.ok) <span class="tok-k">throw new</span> <span class="tok-n">Error</span>(<span class="tok-s">`Failed ${id}: ${res.status}`</span>);</div></div>
+        <div class="ux-diff__row ux-diff__row--add"><div class="ux-diff__ln">82</div><div class="ux-diff__gut"></div><div class="ux-diff__code">  <span class="tok-k">return</span> res.json();</div></div>
+        <div class="ux-diff__row"><div class="ux-diff__ln">83</div><div class="ux-diff__gut"></div><div class="ux-diff__code">}</div></div>
+      </div>
+      <div class="ux-annot">
+        <div class="ux-annot__pin">1</div>
+        <div class="ux-annot__body"><b>Adds the missing failure path.</b> Previously a 4xx/5xx body fell through to <code>res.json()</code> and threw <code>SyntaxError: Unexpected token</code> — useless in logs. The guard now reports the status and the id. <span style="color:var(--text-faint)">Anchored to <code>src/api/processor.ts:80–82</code>.</span></div>
+      </div>
+      <div class="ux-verdict">
+        <div class="ux-check" aria-hidden="true"><svg viewBox="0 0 84 84"><path d="M18 43 L34 58 L66 24"/></svg></div>
+        <div><div class="ux-verdict__t">Approved — correctness fix, no behavior change on the happy path</div><div class="ux-verdict__d">Verified against the current working tree</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-section-title">Blast radius</div>
+    <div class="ux-grid ux-cols-3">
+      <div class="ux-card"><div class="ux-card__title">2 callers</div><div class="ux-card__desc"><code>loadProfile()</code>, <code>refreshFeed()</code> — both already wrap in try/catch</div></div>
+      <div class="ux-card"><div class="ux-card__title">No API change</div><div class="ux-card__desc">Signature and happy-path return value are unchanged</div></div>
+      <div class="ux-card"><div class="ux-card__title">1 new test</div><div class="ux-card__desc"><code>throws on 503</code> added in <code>processor.test.ts</code></div></div>
+    </div>
+    <div class="ux-callout ux-callout--warn" style="margin-top:16px"><b>Watch:</b> callers that relied on the old behavior of receiving <code>{}</code> on failure will now see an exception. Grep found none, but the inference is <span class="ux-strong">unverified across dynamic call sites</span>.</div>
+  </section>
+
+</div>

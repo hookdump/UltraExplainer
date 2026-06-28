@@ -1,0 +1,58 @@
+<!--ux: {"title":"Audit — Requirements vs implementation (UltraExplainer)"} -->
+<div class="ux-wrap">
+
+  <header>
+    <span class="ux-kicker">Audit · Requirements vs plan</span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">Twelve of fourteen requirements line up — the real gap is <span class="lit">one unfired event</span>.</h1>
+    <p class="ux-lede ux-rise" style="--i:1">A point-by-point check of the launch request against the implementation plan: twelve match, one is partial (analytics passthrough), and one is a true gap — whether <code>stoq:restock-modal:submitted</code> fires inside the custom modal, which other integrations may depend on.</p>
+  </header>
+
+  <section class="ux-section">
+    <div class="ux-kpis" style="grid-template-columns:repeat(4,1fr)">
+      <div class="ux-panel ux-kpi ux-rise" style="--i:0"><div class="ux-kpi__val">14</div><div class="ux-kpi__label">Reviewed</div></div>
+      <div class="ux-panel ux-kpi ux-rise" style="--i:1"><div class="ux-kpi__val">12</div><div class="ux-kpi__label">Match</div></div>
+      <div class="ux-panel ux-kpi ux-rise" style="--i:2"><div class="ux-kpi__val" style="color:var(--warn)">1</div><div class="ux-kpi__label">Partial</div></div>
+      <div class="ux-panel ux-kpi ux-kpi--focus ux-kpi--down ux-rise" style="--i:3"><div class="ux-kpi__val">1</div><div class="ux-kpi__label">Gap</div></div>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-toolbar">
+      <div class="ux-section-title" style="margin:0;flex:1">Point-by-point</div>
+      <input class="ux-input" type="search" data-ux-filter=".ux-table" data-ux-count="#rowcount" placeholder="Filter requirements…" aria-label="Filter requirements">
+      <span class="ux-eyebrow" id="rowcount">14 / 14</span>
+    </div>
+    <div class="ux-table-wrap">
+      <div class="ux-table-scroll">
+        <table class="ux-table">
+          <thead><tr><th class="wide">Request</th><th class="wide">Plan</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="wide">Scope to <code>special-edition</code> template only</td><td class="wide">Plan scopes everything to this template</td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">EOD Friday, Tuesday AM launch</td><td class="wide">Plan header states the same window</td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">Configurable BIS button label &amp; modal text</td><td class="wide">Both configurable via block settings</td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">Trigger events via Stoq API</td><td class="wide">Uses <code>openInlineForm</code>, <code>openModal</code>, <code>removeInlineForm</code></td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">Defaults = current behavior when empty</td><td class="wide">Blank settings fall back to Stoq default</td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">Show only for out-of-stock variants</td><td class="wide">DOM-based sold-out detection</td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">Exclude products tagged <code>excludebis</code></td><td class="wide">Checked in PDP and PLP Liquid</td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">Load Stoq form inside the modal</td><td class="wide">PDP modal uses <code>openInlineForm</code></td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">Updated label “Join the waitlist”</td><td class="wide">Pre-populated in template JSON</td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">Theme: Giddy-Up D2C launch clone</td><td class="wide">Clone id <code>145580556374</code></td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">Changes made locally + theme push</td><td class="wide">Local dev then theme push</td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr><td class="wide">Updated modal description copy</td><td class="wide"><code>bis_modal_description</code> setting</td><td><span class="ux-badge ux-badge--success">Match</span></td></tr>
+            <tr class="is-warn"><td class="wide">Forward analytics on submit</td><td class="wide">Plan forwards UTM but not the session id</td><td><span class="ux-badge ux-badge--warn">Partial</span></td></tr>
+            <tr class="is-flag"><td class="wide">Fire <code>stoq:restock-modal:submitted</code> on submit</td><td class="wide">Not addressed for the custom-modal path<small>Unclear whether Stoq auto-dispatches inside <code>openInlineForm</code> or needs a manual <code>dispatchEvent</code>.</small></td><td><span class="ux-badge ux-badge--error">Gap</span></td></tr>
+          </tbody>
+          <tfoot><tr><td>14 reviewed</td><td></td><td>12 match · 1 partial · 1 gap</td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <details class="ux-details ux-section" open>
+    <summary>Gap detail — the unfired event</summary>
+    <div class="ux-details__body">
+      <b>Gap: <code>stoq:restock-modal:submitted</code>.</b> The request explicitly asks to fire this on form submission. The plan uses Stoq's <code>openInlineForm</code> inside a custom modal but doesn't say whether Stoq dispatches the event in that context. If Klaviyo, analytics, or theme JS listen for it, missing it silently breaks the submission pipeline. <span class="ux-strong">Recommend</span> adding an explicit <code>dispatchEvent</code> as a safety net. <span style="color:var(--text-faint)">(Inferred from the plan text; not confirmed against Stoq's runtime.)</span>
+    </div>
+  </details>
+
+</div>

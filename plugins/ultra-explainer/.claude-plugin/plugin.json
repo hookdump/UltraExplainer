@@ -1,0 +1,23 @@
+{
+  "name": "ultra-explainer",
+  "description": "Turn code, systems, diffs, and plans into strikingly clear self-contained HTML — node-edge graphs with routed arrows, annotated diffs, dashboards, timelines, slides, and custom SVG illustrations. Futuristic 'Aurora' design system with an optional glow layer (toggle on/off) and light/dark themes.",
+  "version": "0.1.0",
+  "author": {
+    "name": "hookdump",
+    "url": "https://github.com/hookdump"
+  },
+  "homepage": "https://github.com/hookdump/UltraExplainer",
+  "repository": "https://github.com/hookdump/UltraExplainer",
+  "license": "MIT",
+  "keywords": [
+    "diagrams",
+    "visualization",
+    "html",
+    "diff-review",
+    "architecture",
+    "slides",
+    "mermaid",
+    "dashboard",
+    "code-explanation"
+  ]
+}

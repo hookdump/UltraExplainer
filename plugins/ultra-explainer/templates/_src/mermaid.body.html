@@ -1,0 +1,58 @@
+<!--ux: {"title":"Diagram — Mermaid (UltraExplainer)"} -->
+<div class="ux-wrap">
+
+  <header>
+    <span class="ux-kicker">Flow · Build pipeline</span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">A push only ships if every gate <span class="lit">stays green</span>.</h1>
+    <p class="ux-lede ux-rise" style="--i:1">Themed Mermaid for the cases where relationships are genuinely non-linear. Zoom with the controls or <code>Ctrl/⌘ + scroll</code>, drag to pan, and expand to a new tab.</p>
+  </header>
+
+  <section class="ux-section">
+    <div class="ux-section-title">CI pipeline</div>
+    <div class="ux-diagram-shell">
+      <div class="ux-zoom-controls">
+        <button data-zoom="in" title="Zoom in" aria-label="Zoom in">+</button>
+        <button data-zoom="out" title="Zoom out" aria-label="Zoom out">−</button>
+        <button data-zoom="reset" title="Reset" aria-label="Reset">⟲</button>
+        <button data-zoom="expand" title="Open full size" aria-label="Open full size">⤢</button>
+      </div>
+      <div class="ux-mermaid-wrap">
+        <div class="ux-mermaid-canvas">
+          <pre class="mermaid">
+flowchart TD
+  push["git push"] --> lint{"lint &amp; types"}
+  lint -->|pass| test["unit + integration"]
+  lint -->|fail| block["block PR"]
+  test -->|green| build["build artifact"]
+  test -->|red| block
+  build --> e2e{"e2e gate"}
+  e2e -->|pass| ship["deploy to edge"]
+  e2e -->|flake| retry["auto-retry x2"]
+  retry --> e2e
+  ship --> done(["live"])
+
+  classDef ok fill:#2bd58a26,stroke:#5cf2ad,stroke-width:2.4px,color:#e7edfb
+  classDef warn fill:#ffc55514,stroke:#ffc555,stroke-width:1.3px,color:#cfd6e6
+  classDef stop fill:#ff5d6c14,stroke:#ff5d6c,stroke-width:1.3px,color:#cfd6e6
+  classDef neutral fill:#3b82f61f,stroke:#60b2ff,stroke-width:1.4px,color:#e7edfb
+  class push,test,build neutral
+  class ship,done ok
+  class retry warn
+  class block stop
+          </pre>
+        </div>
+      </div>
+      <span class="ux-zoom-label">100%</span>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-section-title">When to reach for Mermaid</div>
+    <div class="ux-grid ux-cols-3">
+      <div class="ux-card"><div class="ux-card__title">Branches &amp; merges</div><div class="ux-card__desc">Real decision points — not a straight line (use a flow strip for that)</div></div>
+      <div class="ux-card"><div class="ux-card__title">Sequences &amp; state</div><div class="ux-card__desc">Lifelines, transitions, ER — Mermaid renders these cleanly</div></div>
+      <div class="ux-card"><div class="ux-card__title">≤ 12 nodes</div><div class="ux-card__desc">Beyond that, raise altitude or split into overview + detail cards</div></div>
+    </div>
+  </section>
+
+</div>

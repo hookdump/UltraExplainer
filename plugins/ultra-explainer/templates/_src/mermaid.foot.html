@@ -1,0 +1,74 @@
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  var light = document.documentElement.dataset.theme === "light";
+  mermaid.initialize({
+    startOnLoad: false,
+    theme: "base",
+    securityLevel: "loose",
+    flowchart: { curve: "basis", htmlLabels: true, padding: 14, rankSpacing: 40, nodeSpacing: 30, useMaxWidth: true },
+    themeVariables: {
+      fontFamily: "'Space Grotesk', system-ui, sans-serif",
+      fontSize: "15px",
+      background: "transparent",
+      primaryColor: light ? "#ffffff" : "#141d30",
+      primaryBorderColor: light ? "#2563eb" : "#60b2ff",
+      primaryTextColor: light ? "#0e1729" : "#e7edfb",
+      lineColor: light ? "#5b6b8c" : "#7f8db0",
+      tertiaryColor: light ? "#eef2fb" : "#0c1322",
+      edgeLabelBackground: light ? "#eef2fb" : "#0b1120",
+      noteBkgColor: light ? "#eef2fb" : "#162033",
+      noteTextColor: light ? "#0e1729" : "#e7edfb"
+    }
+  });
+  mermaid.run({ querySelector: ".mermaid" }).then(initZoom);
+
+  function initZoom() {
+    document.querySelectorAll(".ux-diagram-shell").forEach(function (shell) {
+      var wrap = shell.querySelector(".ux-mermaid-wrap");
+      var canvas = shell.querySelector(".ux-mermaid-canvas");
+      var label = shell.querySelector(".ux-zoom-label");
+      var svg = canvas.querySelector("svg");
+      if (svg) { svg.removeAttribute("height"); svg.style.width = "100%"; svg.style.maxWidth = "100%"; svg.style.height = "auto"; }
+      var s = 1, tx = 0, ty = 0;
+      function apply() {
+        canvas.style.transform = "translate(" + tx + "px," + ty + "px) scale(" + s + ")";
+        if (label) label.textContent = Math.round(s * 100) + "%";
+      }
+      function zoom(f, cx, cy) {
+        var ns = Math.min(Math.max(s * f, 0.3), 6);
+        if (cx != null) { var r = wrap.getBoundingClientRect(); var px = cx - r.left, py = cy - r.top;
+          tx = px - (px - tx) * (ns / s); ty = py - (py - ty) * (ns / s); }
+        s = ns; apply();
+      }
+      shell.querySelectorAll("[data-zoom]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          var a = b.dataset.zoom;
+          if (a === "in") zoom(1.25); else if (a === "out") zoom(0.8);
+          else if (a === "reset") { s = 1; tx = 0; ty = 0; apply(); }
+          else if (a === "expand") openExpanded(canvas.querySelector("svg"));
+        });
+      });
+      wrap.addEventListener("wheel", function (e) {
+        if (!e.ctrlKey && !e.metaKey) return; e.preventDefault();
+        zoom(e.deltaY < 0 ? 1.12 : 0.89, e.clientX, e.clientY);
+      }, { passive: false });
+      var dragging = false, sx, sy, stx, sty;
+      wrap.addEventListener("mousedown", function (e) {
+        if (e.target.closest(".ux-zoom-controls")) return;
+        dragging = true; wrap.classList.add("is-panning"); sx = e.clientX; sy = e.clientY; stx = tx; sty = ty;
+      });
+      addEventListener("mousemove", function (e) { if (!dragging) return; tx = stx + (e.clientX - sx); ty = sty + (e.clientY - sy); apply(); });
+      addEventListener("mouseup", function () { dragging = false; wrap.classList.remove("is-panning"); });
+      apply();
+    });
+  }
+  function openExpanded(svg) {
+    if (!svg) return;
+    var bg = getComputedStyle(document.documentElement).getPropertyValue("--bg").trim() || "#05070d";
+    var clone = svg.cloneNode(true); clone.style.maxWidth = "96vw"; clone.style.maxHeight = "92vh"; clone.style.height = "auto";
+    var w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write("<!doctype html><meta charset=utf-8><title>Diagram</title><body style='margin:0;min-height:100vh;display:grid;place-items:center;background:" + bg + ";padding:24px'>" + clone.outerHTML + "</body>");
+    w.document.close();
+  }
+</script>

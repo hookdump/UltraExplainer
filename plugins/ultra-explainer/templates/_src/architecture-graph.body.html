@@ -1,0 +1,68 @@
+<!--ux: {"title":"Architecture — Ingestion pipeline (UltraExplainer)","head":"<style>.lay-pipe{grid-template-columns:repeat(5,minmax(0,1fr));grid-template-areas:'src ingest classify cluster store' 'src ingest embed cluster store' 'src ingest enrich cluster store'}.ga-src{grid-area:src}.ga-ingest{grid-area:ingest}.ga-classify{grid-area:classify}.ga-embed{grid-area:embed}.ga-enrich{grid-area:enrich}.ga-cluster{grid-area:cluster}.ga-store{grid-area:store}@media(max-width:820px){.lay-pipe{grid-template-columns:1fr;grid-template-areas:'src' 'ingest' 'classify' 'embed' 'enrich' 'cluster' 'store'}}</style>"} -->
+<div class="ux-wrap">
+
+  <header>
+    <span class="ux-kicker">Architecture · Feedback ingestion</span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">Three workers fan out from one gate, then <span class="lit">collapse into a single searchable store.</span></h1>
+    <p class="ux-lede ux-rise" style="--i:1">A cheap relevance gate runs first, so the expensive classify / embed / enrich workers only touch what matters. They run in parallel, then merge at clustering before anything is written. Hover any node to trace its dependencies; toggle glow off (top-right) for a calm, flat rendering.</p>
+  </header>
+
+  <section class="ux-section">
+    <div class="ux-section-title">Pipeline graph</div>
+    <p class="ux-eyebrow" style="margin-bottom:18px">arrows are drawn by a connector engine and re-route on resize · hover a node to highlight its path</p>
+    <div class="ux-graph">
+      <svg class="ux-graph__edges" aria-hidden="true"></svg>
+      <div class="ux-graph__layer lay-pipe">
+        <div class="ux-node ga-src" data-accent="azure" id="n-src"><div class="ux-node__label">sources</div><div class="ux-node__title">Events</div><div class="ux-node__desc">Slack · GitHub · email</div></div>
+        <div class="ux-node ga-ingest" data-accent="cyan" id="n-ingest"><div class="ux-node__label">gate</div><div class="ux-node__title">Ingest</div><div class="ux-node__desc">Dedup + cheap relevance check</div></div>
+        <div class="ux-node ga-classify" data-accent="violet" id="n-classify"><div class="ux-node__label">worker</div><div class="ux-node__title">Classify</div><div class="ux-node__desc">Schema-validated labels</div></div>
+        <div class="ux-node ga-embed" data-accent="violet" id="n-embed"><div class="ux-node__label">worker</div><div class="ux-node__title">Embed</div><div class="ux-node__desc">1536-d vector</div></div>
+        <div class="ux-node ga-enrich" data-accent="violet" id="n-enrich"><div class="ux-node__label">worker</div><div class="ux-node__title">Enrich</div><div class="ux-node__desc">User + account resolution</div></div>
+        <div class="ux-node ga-cluster" data-accent="cyan" id="n-cluster"><div class="ux-node__label">merge</div><div class="ux-node__title">Cluster</div><div class="ux-node__desc">Cosine grouping</div></div>
+        <div class="ux-node ga-store" data-accent="green" id="n-store"><div class="ux-node__label">store</div><div class="ux-node__title">feedback.db</div><div class="ux-node__desc">The one source of truth</div></div>
+      </div>
+      <script type="application/json" class="ux-edges">
+        [{"from":"n-src","to":"n-ingest","color":"azure"},
+         {"from":"n-ingest","to":"n-classify","color":"violet"},
+         {"from":"n-ingest","to":"n-embed","color":"violet"},
+         {"from":"n-ingest","to":"n-enrich","color":"violet"},
+         {"from":"n-classify","to":"n-cluster","color":"edge"},
+         {"from":"n-embed","to":"n-cluster","color":"edge"},
+         {"from":"n-enrich","to":"n-cluster","color":"edge"},
+         {"from":"n-cluster","to":"n-store","color":"green"}]
+      </script>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-grid" style="grid-template-columns:1fr 1fr;align-items:start">
+      <div>
+        <div class="ux-section-title">Where the volume goes</div>
+        <div class="ux-panel">
+          <div class="ux-label ux-label--cyan"><span class="ux-dot"></span> Events surviving each stage</div>
+          <div class="ux-bars" style="height:150px">
+            <div class="ux-bar"><div class="ux-bar__col" style="height:100%"></div><div class="ux-bar__v">100k</div><div class="ux-bar__x">raw</div></div>
+            <div class="ux-bar"><div class="ux-bar__col" style="height:34%"></div><div class="ux-bar__v">34k</div><div class="ux-bar__x">dedup</div></div>
+            <div class="ux-bar"><div class="ux-bar__col" style="height:9%"></div><div class="ux-bar__v">9k</div><div class="ux-bar__x">relevant</div></div>
+            <div class="ux-bar"><div class="ux-bar__col ux-bar__col--g is-focus" style="height:9%"></div><div class="ux-bar__v">9k</div><div class="ux-bar__x">stored</div></div>
+          </div>
+          <p class="ux-prose" style="font-size:13px;margin-top:12px">The gate drops <span class="ux-strong">91%</span> before any LLM runs — so the costly workers see 9k items, not 100k.</p>
+        </div>
+      </div>
+      <div data-tabs>
+        <div class="ux-section-title">Why the gate runs first</div>
+        <div class="ux-tabbar" role="tablist">
+          <button class="ux-tab" role="tab" aria-selected="true" data-tab="cost">Cost</button>
+          <button class="ux-tab" role="tab" aria-selected="false" data-tab="lat">Latency</button>
+          <button class="ux-tab" role="tab" aria-selected="false" data-tab="acc">Accuracy</button>
+        </div>
+        <div class="ux-tabpanel ux-prose" data-panel="cost">Classify + embed cost ≈ $0.004 per item. Gating to the relevant 9% turns a <span class="ux-strong">$400 run into $36</span> — the single biggest lever in the pipeline.</div>
+        <div class="ux-tabpanel ux-prose" data-panel="lat" hidden>The relevance check is one cheap boolean call (~120ms). The heavy workers never queue behind irrelevant traffic, so p95 end-to-end stays under <span class="ux-strong">2s</span>.</div>
+        <div class="ux-tabpanel ux-prose" data-panel="acc" hidden>Fewer junk items means tighter clusters: precision on the top-20 clusters rose from <span class="ux-strong">0.71 to 0.88</span> once noise stopped diluting centroids.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ux-callout ux-section"><b>Multi-tenant.</b> Each agent gets an isolated database at <code>{agentDir}/intelligence/feedback.db</code> — the collapse point above — with per-agent config overlay and credential isolation.</div>
+
+</div>

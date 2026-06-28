@@ -1,0 +1,95 @@
+<!--ux: {"title":"Slides — Edge Gateway Migration (UltraExplainer)","fonts":true} -->
+<div class="ux-deck">
+
+  <!-- 1 · TITLE -->
+  <section class="ux-slide slide--title">
+    <p class="s-sub reveal">Engineering review · Q3 2026</p>
+    <h1 class="s-display reveal" style="margin:18px 0">Edge Gateway <span class="lit">Migration</span></h1>
+    <p class="s-sub reveal" style="color:var(--text-faint)">From a single Node proxy to edge-native routing</p>
+  </section>
+
+  <!-- 2 · DIVIDER -->
+  <section class="ux-slide slide--divider">
+    <span class="s-num">01</span>
+    <h2 class="s-h reveal">The problem</h2>
+    <p class="s-body reveal" style="margin-top:14px">Why one proxy process can't carry the traffic anymore.</p>
+  </section>
+
+  <!-- 3 · SPLIT before/after -->
+  <section class="ux-slide slide--split">
+    <div class="s-cols">
+      <div>
+        <p class="s-sub reveal" style="color:var(--remove)">Before</p>
+        <h2 class="s-h reveal" style="margin:10px 0 4px">Monolith proxy</h2>
+        <ul class="s-bullets">
+          <li class="reveal">All traffic through one Node process</li>
+          <li class="reveal">Per-instance rate limits, not distributed</li>
+          <li class="reveal">Synchronous JWT adds ~40ms</li>
+          <li class="reveal">No circuit breaking — failures cascade</li>
+        </ul>
+      </div>
+      <div>
+        <p class="s-sub reveal" style="color:var(--green-bright)">After</p>
+        <h2 class="s-h reveal" style="margin:10px 0 4px">Edge-native</h2>
+        <ul class="s-bullets">
+          <li class="reveal">Workers at 340 edge locations</li>
+          <li class="reveal">Durable Objects for shared state</li>
+          <li class="reveal">Async JWT with key caching</li>
+          <li class="reveal">Automatic per-upstream breakers</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 · DIVIDER -->
+  <section class="ux-slide slide--divider">
+    <span class="s-num">02</span>
+    <h2 class="s-h reveal">How it routes</h2>
+    <p class="s-body reveal" style="margin-top:14px">One worker guards, then forwards.</p>
+  </section>
+
+  <!-- 5 · DIAGRAM -->
+  <section class="ux-slide slide--diagram">
+    <h2 class="s-h reveal" style="margin-bottom:18px">Request flow</h2>
+    <div class="ux-mermaid-canvas reveal">
+      <pre class="mermaid">
+flowchart LR
+  c["Client"] --> e["Edge Worker"]
+  e --> a["Auth Cache"]
+  e --> r["Rate Limiter"]
+  e --> rt["Resolver"]
+  rt --> api["API"]
+  api --> db[("Database")]
+  classDef ok fill:#2bd58a22,stroke:#2bd58a,stroke-width:2px,color:#e7edfb
+  classDef n fill:#3b82f622,stroke:#60b2ff,stroke-width:1.5px,color:#e7edfb
+  class c,e,rt,api n
+  class db ok
+      </pre>
+    </div>
+  </section>
+
+  <!-- 6 · DASHBOARD KPIs -->
+  <section class="ux-slide">
+    <h2 class="s-h reveal" style="margin-bottom:24px">What it bought us</h2>
+    <div class="s-kpis">
+      <div class="ux-panel ux-kpi ux-kpi--focus ux-kpi--cyan reveal"><div class="ux-kpi__val">12ms</div><div class="ux-kpi__label">P99 latency</div><div class="ux-kpi__trend ux-kpi__trend--up">↓ from 142ms</div></div>
+      <div class="ux-panel ux-kpi reveal"><div class="ux-kpi__val">99.97%</div><div class="ux-kpi__label">Uptime</div><div class="ux-kpi__trend ux-kpi__trend--up">↑ from 99.2%</div></div>
+      <div class="ux-panel ux-kpi reveal"><div class="ux-kpi__val">−68%</div><div class="ux-kpi__label">Cost / 10k req</div><div class="ux-kpi__trend">$0.02 each</div></div>
+    </div>
+  </section>
+
+  <!-- 7 · QUOTE -->
+  <section class="ux-slide slide--quote">
+    <div class="mark reveal" aria-hidden="true">&ldquo;</div>
+    <blockquote class="reveal">The fastest request is the one that never leaves the edge.</blockquote>
+    <p class="s-sub reveal" style="margin-top:24px;color:var(--text-faint)">— Migration principle</p>
+  </section>
+
+  <!-- 8 · CTA -->
+  <section class="ux-slide slide--title">
+    <p class="s-sub reveal" style="color:var(--cyan-soft)">Next step</p>
+    <h2 class="s-display reveal" style="font-size:clamp(36px,6vw,76px);margin:16px 0">Ship <span class="lit">shadow mode</span> this week</h2>
+    <p class="s-sub reveal" style="color:var(--text-faint)">Full cutover targeted for end of quarter</p>
+  </section>
+
+</div>
