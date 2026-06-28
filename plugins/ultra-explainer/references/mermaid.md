@@ -1,8 +1,8 @@
-# Mermaid in Aurora
+# Mermaid in UltraExplainer
 
-Mermaid is one tool in the UltraExplainer toolbox, not the default. Reach for it only when a relationship is genuinely non-linear and auto-layout earns its keep. For everything that fits a straight line, a grid, or a known shape, hand-build it — that is where Aurora's variety and polish live.
+Mermaid is one tool in the UltraExplainer toolbox, not the default. Reach for it only when a relationship is genuinely non-linear and auto-layout earns its keep. For everything that fits a straight line, a grid, or a known shape, hand-build it — that is where UltraExplainer's variety and polish live.
 
-This file tells you when to pick Mermaid, how to wire it into Aurora so it inherits the theme, the exact diagram-shell markup the zoom/pan/expand behavior depends on, and the authoring rules that keep diagrams from breaking or rendering ugly.
+This file tells you when to pick Mermaid, how to wire it into UltraExplainer so it inherits the theme, the exact diagram-shell markup the zoom/pan/expand behavior depends on, and the authoring rules that keep diagrams from breaking or rendering ugly.
 
 ---
 
@@ -27,13 +27,13 @@ Do **NOT** use Mermaid for:
 
 Litmus test: if you could draw it as one row of boxes with arrows between adjacent boxes, it is NOT a Mermaid diagram. The moment you have a back-edge, a fork that reconverges, or a lifeline, Mermaid pays off.
 
-A node-edge graph built from `.ux-node` + the connector engine is the Aurora-native alternative for small-to-medium graphs. It gets routed arrows, hover-to-trace, glow, and live re-theming. Prefer it for graphs up to ~8 nodes where you control the layout; reach for Mermaid when auto-layout (dagre/elk) genuinely saves you from manual positioning.
+A node-edge graph built from `.ux-node` + the connector engine is the UltraExplainer-native alternative for small-to-medium graphs. It gets routed arrows, hover-to-trace, glow, and live re-theming. Prefer it for graphs up to ~8 nodes where you control the layout; reach for Mermaid when auto-layout (dagre/elk) genuinely saves you from manual positioning.
 
 ---
 
-## 2. Aurora init
+## 2. UltraExplainer init
 
-Mermaid theming in Aurora rests on one hard fact: **`theme: 'base'` is the only theme where your `themeVariables` are honored.** The built-in `default`, `dark`, `forest`, and `neutral` themes ignore most overrides. Always set `theme: 'base'`.
+Mermaid theming in UltraExplainer rests on one hard fact: **`theme: 'base'` is the only theme where your `themeVariables` are honored.** The built-in `default`, `dark`, `forest`, and `neutral` themes ignore most overrides. Always set `theme: 'base'`.
 
 Read the current theme from `data-theme` on `<html>` at load time and pick light/dark values accordingly. The FOUC-free head snippet has already resolved `data-theme` to `"light"` or `"dark"` before the stylesheet paints, so it is reliable by the time your module runs.
 
@@ -63,32 +63,32 @@ Read the current theme from `data-theme` on `<html>` at load time and pick light
 </script>
 ```
 
-### themeVariables → Aurora mapping
+### themeVariables → token mapping
 
-These hex literals are the resolved values of Aurora's tokens (`themeVariables` is static config — you cannot pass `var(--…)` here, so you bake the literals):
+`themeVariables` is static config — you cannot pass `var(--…)`, so you bake in literals. The values below are the **Luminous** preset's resolved tokens (the natural home for Mermaid's dark glass look); for another preset, read that preset's tokens from `assets/themes.css` and bake those instead. Always map to the semantic token, not a guessed hex.
 
-| themeVariable | Dark (Aurora Night) | Light (Aurora Day) | Aurora token |
+| themeVariable | Dark (Luminous) | Light | maps to token |
 |---|---|---|---|
-| `primaryColor` (node fill) | `#141d30` | `#ffffff` | `--surface` / `--surface-solid` |
-| `primaryBorderColor` | `#60b2ff` | `#2563eb` | `--azure-bright` / `--azure` |
+| `primaryColor` (node fill) | `#141d30` | `#ffffff` | `--surface` |
+| `primaryBorderColor` | `#60b2ff` | `#2563eb` | `--accent` |
 | `primaryTextColor` | `#e7edfb` | `#0e1729` | `--text` |
-| `lineColor` (edges) | `#7f8db0` | `#5b6b8c` | edge stroke |
-| `tertiaryColor` (subgraph bg) | `#0c1322` | `#eef2fb` | `--bg-2` / `--bg` |
-| `noteBkgColor` | `#162033` | `#eef2fb` | note surface |
+| `lineColor` (edges) | `#7f8db0` | `#5b6b8c` | `--edge` |
+| `tertiaryColor` (subgraph bg) | `#0c1322` | `#eef2fb` | `--bg` / `--surface-2` |
+| `noteBkgColor` | `#162033` | `#eef2fb` | `--surface-2` |
 | `noteTextColor` | `#e7edfb` | `#0e1729` | `--text` |
 | `background` | `transparent` | `transparent` | shell shows through |
-| `fontFamily` | `'Space Grotesk', …` | same | `--font-display` |
+| `fontFamily` | `'Space Grotesk', …` | per preset | `--font-display` |
 
-Keep `background: "transparent"` so the glass `.ux-diagram-shell` and the page nebula show through the SVG.
+Keep `background: "transparent"` so the `.ux-diagram-shell` (and, on Luminous, the page field) shows through the SVG.
 
 ### Known limitation: no reactive re-theming
 
-**Mermaid initializes once and bakes its colors into the rendered SVG. It cannot re-theme when the user flips the corner theme switcher.** The Aurora switcher's theme button calls `redrawGraphs()`, which only redraws the native `.ux-graph` connector paths — it does not and cannot recolor a Mermaid SVG. This is a deliberate, accepted tradeoff.
+**Mermaid initializes once and bakes its colors into the rendered SVG. It cannot re-theme when the user flips the corner theme switcher.** The UltraExplainer switcher's theme button calls `redrawGraphs()`, which only redraws the native `.ux-graph` connector paths — it does not and cannot recolor a Mermaid SVG. This is a deliberate, accepted tradeoff.
 
 Consequences you must design around:
 
 - The Mermaid `themeVariables` are chosen from whatever `data-theme` was at **page load**. If the user toggles, the rest of the page recolors but the Mermaid SVG keeps its load-time colors.
-- This is one more reason to prefer Aurora-native node-edge graphs for anything you can lay out yourself — they follow the toggle.
+- This is one more reason to prefer UltraExplainer-native node-edge graphs for anything you can lay out yourself — they follow the toggle.
 - The CSS overrides on `.mermaid .nodeLabel` / `.edgeLabel` (below) DO use `var(--…)` with `!important`, so label *text color* does follow the toggle. Node fills, borders, and edge strokes do not. Accept the mild mismatch; do not try to re-run `mermaid.run` on toggle (it re-parses and flickers).
 - Glow toggle (`data-fx`) does not touch Mermaid at all — Mermaid SVGs are flat by design and look correct in both glow and flat modes.
 
@@ -161,7 +161,7 @@ Use HTML entities for literal symbols inside labels — e.g. `&amp;` for `&` (as
 
 **`classDef` fills use 8-digit hex; never set `color:`.** `classDef` is static text — it cannot read CSS variables. Use semi-transparent 8-digit hex fills (`RRGGBBAA`) so the tint layers over Mermaid's base background and survives in both schemes. Use `22`–`44` alpha for subtle, `55`–`77` for prominent. **Never put `color:` in a `classDef` or per-node `style`** — it hardcodes a text color that breaks in the opposite scheme. Let the `.mermaid .nodeLabel { color: var(--text) }` override own text color.
 
-Aurora-palette `classDef` set (alpha-22 fills over the ramp + semantic colors):
+UltraExplainer-palette `classDef` set (alpha-22 fills over the ramp + semantic colors):
 
 ```
 classDef neutral fill:#3b82f622,stroke:#60b2ff,stroke-width:1.5px
@@ -199,7 +199,7 @@ If you need multi-line labels or special characters in what would be a state dia
 
 ## 5. SVG insertion + namespace gotchas
 
-**Never define a page-level `.node` class.** Mermaid renders every flowchart vertex into an SVG group with class `node` (and `.nodeLabel`, `.edgeLabel`, `.actor`, `.messageText`, `.er.entityBox`, `.cluster-label`). A stray `.node { … }` rule in your page CSS will bleed into the diagram and corrupt it. This is exactly why the Aurora design system prefixes everything with `.ux-` — `.ux-node` is the Aurora card, `.node` belongs to Mermaid. Keep that boundary; never style a bare `.node`, `.edge`, `.actor`, or `.cluster`.
+**Never define a page-level `.node` class.** Mermaid renders every flowchart vertex into an SVG group with class `node` (and `.nodeLabel`, `.edgeLabel`, `.actor`, `.messageText`, `.er.entityBox`, `.cluster-label`). A stray `.node { … }` rule in your page CSS will bleed into the diagram and corrupt it. This is exactly why the UltraExplainer design system prefixes everything with `.ux-` — `.ux-node` is the UltraExplainer card, `.node` belongs to Mermaid. Keep that boundary; never style a bare `.node`, `.edge`, `.actor`, or `.cluster`.
 
 **Scope your Mermaid CSS overrides under `.mermaid`.** These are the only overrides that reach inside the SVG, and they must stay namespaced:
 
@@ -215,4 +215,4 @@ The `.nodeLabel`/`.edgeLabel` color overrides are what make label text track the
 
 **Insertion model.** With `securityLevel: "loose"` and `htmlLabels: true`, Mermaid emits HTML `<div>`-based labels inside `<foreignObject>` — that is what lets `.nodeLabel` respond to your CSS `color`. After `mermaid.run` resolves, the SVG lives inside `.ux-mermaid-canvas > pre.mermaid`; `initZoom` finds it via `canvas.querySelector("svg")`, removes its fixed `height`, and sets `maxWidth:100%`. Do not insert the SVG yourself or move it out of the canvas — the transform-based zoom is applied to `.ux-mermaid-canvas`, and `expand` clones `canvas.querySelector("svg")`.
 
-**ELK layout is optional and separate.** `layout: 'elk'` needs a second import (`@mermaid-js/layout-elk`) plus `mermaid.registerLayoutLoaders(elkLayouts)`. Without both, `layout:'elk'` silently falls back to dagre. ELK adds real bundle weight; only import it when a genuinely dense graph positions badly under dagre. Most Aurora diagrams (≤12 nodes) render fine on the default dagre engine — skip ELK.
+**ELK layout is optional and separate.** `layout: 'elk'` needs a second import (`@mermaid-js/layout-elk`) plus `mermaid.registerLayoutLoaders(elkLayouts)`. Without both, `layout:'elk'` silently falls back to dagre. ELK adds real bundle weight; only import it when a genuinely dense graph positions badly under dagre. Most UltraExplainer diagrams (≤12 nodes) render fine on the default dagre engine — skip ELK.

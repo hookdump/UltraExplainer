@@ -1,0 +1,60 @@
+<!--ux: {"title":"PR #482 — stale-while-revalidate — UltraExplainer","preset":"terminal","theme":"dark","head":"<style>.lay-callers{grid-template-columns:1fr 1.1fr;align-items:center;gap:18px}@media(max-width:760px){.lay-callers{grid-template-columns:1fr}}</style>"} -->
+<div class="ux-wrap">
+
+  <header>
+    <span class="ux-kicker">PR #482 · cache.ts · <span class="ux-strong">review</span></span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">This trades a blocking refresh for <span class="lit">stale-while-revalidate</span> — reads stop waiting on the origin, at the cost of serving data up to one TTL old on a failed refresh.</h1>
+    <p class="ux-lede ux-rise" style="--i:1">+8 −3 across one file. The behavioral change is small but real: callers that assumed a read is always fresh need to tolerate a brief staleness window.</p>
+  </header>
+
+  <section class="ux-section">
+    <div class="ux-diff">
+      <div class="ux-diff__bar"><span class="ux-diff__branch">⎇</span><span class="ux-diff__file">src/cache.ts</span><span class="ux-diff__tally"><span class="add">+8</span><span class="del">−3</span></span></div>
+      <div class="ux-diff__scroll">
+        <div class="ux-diff__row"><div class="ux-diff__ln">38</div><div class="ux-diff__gut"></div><div class="ux-diff__code"><span class="tok-k">async function</span> <span class="tok-f">getCached</span>(key, loader) {</div></div>
+        <div class="ux-diff__row"><div class="ux-diff__ln">39</div><div class="ux-diff__gut"></div><div class="ux-diff__code">  <span class="tok-k">const</span> hit = <span class="tok-k">await</span> store.<span class="tok-f">get</span>(key);</div></div>
+        <div class="ux-diff__row ux-diff__row--del"><div class="ux-diff__ln"></div><div class="ux-diff__gut">-</div><div class="ux-diff__code">  <span class="tok-k">if</span> (hit) <span class="tok-k">return</span> hit.value;</div></div>
+        <div class="ux-diff__row ux-diff__row--del"><div class="ux-diff__ln"></div><div class="ux-diff__gut">-</div><div class="ux-diff__code">  <span class="tok-k">const</span> fresh = <span class="tok-k">await</span> <span class="tok-f">loader</span>();  <span class="tok-c">// blocks every miss AND every expiry</span></div></div>
+        <div class="ux-diff__row ux-diff__row--add"><div class="ux-diff__ln">40</div><div class="ux-diff__gut">+</div><div class="ux-diff__code">  <span class="tok-k">if</span> (hit && !hit.<span class="tok-f">isStale</span>()) <span class="tok-k">return</span> hit.value;</div></div>
+        <div class="ux-diff__row ux-diff__row--add"><div class="ux-diff__ln">41</div><div class="ux-diff__gut">+</div><div class="ux-diff__code">  <span class="tok-k">if</span> (hit) { <span class="tok-f">revalidate</span>(key, loader); <span class="tok-k">return</span> hit.value; } <span class="tok-c">// serve stale, refresh in bg</span></div></div>
+        <div class="ux-diff__row ux-diff__row--add"><div class="ux-diff__ln">42</div><div class="ux-diff__gut">+</div><div class="ux-diff__code">  <span class="tok-k">const</span> fresh = <span class="tok-k">await</span> <span class="tok-f">loader</span>();  <span class="tok-c">// only a cold miss blocks now</span></div></div>
+        <div class="ux-diff__row"><div class="ux-diff__ln">43</div><div class="ux-diff__gut"></div><div class="ux-diff__code">  <span class="tok-k">await</span> store.<span class="tok-f">set</span>(key, fresh, { ttl: <span class="tok-n">60</span> });</div></div>
+        <div class="ux-diff__row"><div class="ux-diff__ln">44</div><div class="ux-diff__gut"></div><div class="ux-diff__code">  <span class="tok-k">return</span> fresh;</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-grid ux-cols-2" style="align-items:start">
+      <div class="ux-verdict">
+        <div class="ux-verdict__t"><span class="ux-badge ux-badge--good">ship</span> with one ask</div>
+        <div class="ux-verdict__d">The fast-path win is real and the code is sound. Before merge: <span class="ux-strong">cap the staleness window</span>. A failed <code>revalidate()</code> currently lets a key serve stale indefinitely if the loader keeps failing — add a hard "max stale" so a persistent origin outage eventually surfaces an error instead of silently aging data.</div>
+      </div>
+      <div>
+        <div class="ux-section-title">Blast radius</div>
+        <div class="ux-graph">
+          <svg class="ux-graph__edges" aria-hidden="true"></svg>
+          <div class="ux-graph__layer lay-callers">
+            <div>
+              <div class="ux-node" id="d-a"><div class="ux-node__title">profile.ts</div></div>
+              <div class="ux-node" id="d-b" style="margin-top:12px"><div class="ux-node__title">feed.ts</div></div>
+              <div class="ux-node" id="d-c" style="margin-top:12px"><div class="ux-node__title">settings.ts</div></div>
+            </div>
+            <div class="ux-node" data-accent="accent2" id="d-fn"><div class="ux-node__label">changed</div><div class="ux-node__title">getCached()</div><div class="ux-node__desc">3 call sites</div></div>
+          </div>
+          <script type="application/json" class="ux-edges">
+            [{"from":"d-a","to":"d-fn","color":"accent"},
+             {"from":"d-b","to":"d-fn","color":"accent"},
+             {"from":"d-c","to":"d-fn","color":"meta"}]
+          </script>
+        </div>
+        <p class="ux-prose" style="font-size:12.5px;color:var(--text-dim);margin-top:10px"><code>settings.ts</code> (dimmed) reads rarely-changing data — staleness is harmless there. <code>feed.ts</code> is the one to watch.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-callout ux-callout--warn"><strong>Caveat.</strong> Diff and call sites here are an illustrative example, not a real repository. In a live review every line number, SHA, and caller edge resolves to an actual <code>git</code> ref — the page is generated from real <code>git diff</code> output, never retyped.</div>
+  </section>
+
+</div>

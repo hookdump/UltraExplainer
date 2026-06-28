@@ -1,15 +1,18 @@
 # Examples
 
-The seven files in [`../plugins/ultra-explainer/templates/`](../plugins/ultra-explainer/templates/) are themselves complete, self-contained example outputs — open any of them directly in a browser (no server needed) and use the corner switcher to toggle **night / day** and **glow / flat**.
+The files in [`../plugins/ultra-explainer/templates/`](../plugins/ultra-explainer/templates/) are complete, self-contained example outputs — open any directly in a browser (no server needed) and use the corner switcher to toggle **night / day** (and, on Luminous, **glow / flat**). Each is rendered in the design language that fits its subject.
 
-| File | Demonstrates |
-|---|---|
-| `architecture-graph.html` | A node-edge graph with routed arrows (fan-out → collapse), hover-to-trace, a funnel chart, and tabs |
-| `diff-review.html` | An annotated diff with comment connector, approved verdict, and blast-radius cards |
-| `dashboard.html` | Focal-glow KPIs, an SVG area chart, a conic donut, calm bars, and a table |
-| `concept.html` | A custom SVG illustration (cosine vs. Euclidean), naive-vs-correct panels, and a worked example |
-| `data-table.html` | A live-filterable audit table with status badges and flagged rows |
-| `mermaid.html` | An Aurora-themed Mermaid flowchart with zoom / pan / expand |
-| `slides.html` | A full-viewport slide deck with keyboard / scroll navigation |
+| File | Language | Demonstrates |
+|---|---|---|
+| `chameleon.<preset>.html` | all 7 | the **same** cache explanation rendered in every design language — the squint test |
+| `editorial-concept.html` | Editorial | concept explainer: custom SVG ring, naive-vs-correct, scroll-spy nav, sidenotes |
+| `terminal-diff.html` | Terminal | PR review: annotated diff + verdict + blast-radius graph |
+| `instrument-dashboard.html` | Instrument | KPI masthead + honest line/bar charts + sortable, filterable table |
+| `playground.html` | Blueprint | an interactive parameter model — sliders drive every KPI and bar live |
+| `notebook-teach.html` | Notebook | TEACH mode: a step-through player, predict-then-reveal, exit ticket |
+| `swiss-comparison.html` | Swiss | a decision matrix: oversized numerals + sortable comparison table |
+| `luminous-flow.html` | Luminous | a system flow with a scenario toggle (cache hit / miss) + optional glow |
+| `mermaid.html` | (any) | a themed Mermaid flowchart with zoom / pan / expand |
+| `slides.html` | (any) | a full-viewport slide deck with keyboard / scroll / touch navigation |
 
-These are produced by [`../scripts/build-templates.mjs`](../scripts/build-templates.mjs), which inlines the canonical `assets/aurora.css` and `assets/aurora.js` into each page. When the skill runs for real, it adapts one of these to your actual code with the synthesis method in [`../plugins/ultra-explainer/references/synthesis-method.md`](../plugins/ultra-explainer/references/synthesis-method.md).
+These are produced by [`../scripts/build.mjs`](../scripts/build.mjs), which reads a per-body directive and inlines the canonical `assets/core.css` + `assets/themes.css` + `assets/ux.js` into each page. When the skill runs for real, it picks the design language and representation for your actual code and follows the synthesis method in [`../plugins/ultra-explainer/references/synthesis-method.md`](../plugins/ultra-explainer/references/synthesis-method.md).

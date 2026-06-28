@@ -6,7 +6,7 @@ A deck is a different medium from a scrolling page: one idea per viewport, big t
 
 - The deck is `.ux-deck` (a `100dvh` scroll-snap container); each slide is a `.ux-slide` (`100dvh`). `slides.head.html` overrides the body to `overflow:hidden` and supplies slide-type CSS; `slides.foot.html` runs the `SlideEngine` (progress bar, dots, counter, hint, `IntersectionObserver` reveal, keyboard/scroll/touch nav).
 - Wrap each slide's children in `.reveal` to get staggered entrance (auto-disabled under `prefers-reduced-motion`).
-- The theme/glow switcher and particle field still work — they come from the inlined `aurora.css`/`aurora.js`.
+- The theme/glow switcher and (Luminous) particle field still work — they come from the inlined `core.css` / `themes.css` / `ux.js`. The slide engine itself lives in the `slides.head.html` / `slides.foot.html` sidecars, so it composes on top of any preset.
 
 ## Slide types (compose freely)
 
@@ -23,6 +23,6 @@ A deck is a different medium from a scrolling page: one idea per viewport, big t
 
 - **One idea per slide.** Larger type than a page (`.s-display` is 46–100px). Fewer objects. Vary composition (centered, split, full-bleed) so it doesn't feel like a paginated article.
 - **Inventory the source first**, map every item to a slide, and *add slides* rather than cramming — never drop content to hit a fixed count.
-- **Mermaid on a slide**: render at presentation scale (18px labels). Init with `theme:'base'` + Aurora `themeVariables` read from `data-theme` (see `references/mermaid.md`); the slides foot already does this.
+- **Mermaid on a slide**: render at presentation scale (18px labels). Init with `theme:'base'` + `themeVariables` read from the active theme's tokens / `data-theme` (see `references/mermaid.md`); the slides foot already does this.
 - Keep the salience discipline: one focal point per slide, glow only on the T0 element, everything else calm.
 - The first slide is the cover; the last is a clear next-step CTA.

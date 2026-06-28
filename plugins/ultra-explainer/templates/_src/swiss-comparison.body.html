@@ -1,0 +1,52 @@
+<!--ux: {"title":"Rate limiter — pick one — UltraExplainer","preset":"swiss","theme":"light","head":"<style>.cmp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:2px solid var(--text);border-bottom:1px solid var(--hairline-strong);margin:8px 0 4px}.cmp-stat{padding:18px 0}.cmp-stat .n{font-family:var(--font-display);font-weight:700;font-size:clamp(40px,6vw,68px);line-height:.95;letter-spacing:-.02em}.cmp-stat .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);margin-top:8px}.cmp-stat .n.hot{color:var(--accent)}</style>"} -->
+<div class="ux-wrap">
+
+  <header>
+    <span class="ux-kicker">Decision · API rate limiting</span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">Use a <span class="lit">token bucket</span>. It's the only option that absorbs real-world bursts without throttling steady, well-behaved traffic.</h1>
+    <p class="ux-lede ux-rise" style="--i:1">Four strategies, scored on what actually bites in production: burst tolerance, memory cost, fairness, and how hard it is to get right. One wins on the axis that matters most for a public API.</p>
+  </header>
+
+  <section class="ux-section">
+    <div class="cmp-stats">
+      <div class="cmp-stat"><div class="n hot">2×</div><div class="k">Burst headroom, free</div></div>
+      <div class="cmp-stat"><div class="n">O(1)</div><div class="k">State per client</div></div>
+      <div class="cmp-stat"><div class="n">~20</div><div class="k">Lines to implement</div></div>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-section-title">Scored against what bites in production</div>
+    <div class="ux-table-wrap"><div class="ux-table-scroll"><table class="ux-table" id="rl">
+      <thead><tr>
+        <th data-sort>Strategy <span class="ux-sort-i"></span></th>
+        <th data-sort="num" class="num">Burst /10 <span class="ux-sort-i"></span></th>
+        <th data-sort="num" class="num">Mem /10 <span class="ux-sort-i"></span></th>
+        <th data-sort="num" class="num">Fairness /10 <span class="ux-sort-i"></span></th>
+        <th data-sort="num" class="num">Simplicity /10 <span class="ux-sort-i"></span></th>
+        <th>Verdict</th>
+      </tr></thead>
+      <tbody>
+        <tr class="is-flag"><td><span class="ux-strong">Token bucket</span></td><td class="num">9</td><td class="num">9</td><td class="num">8</td><td class="num">8</td><td><span class="ux-badge ux-badge--good">pick this</span></td></tr>
+        <tr><td>Sliding-window log</td><td class="num">8</td><td class="num">3</td><td class="num">9</td><td class="num">5</td><td><span class="ux-badge">accurate, costly</span></td></tr>
+        <tr><td>Fixed window</td><td class="num">3</td><td class="num">10</td><td class="num">4</td><td class="num">10</td><td><span class="ux-badge ux-badge--warn">edge bursts</span></td></tr>
+        <tr><td>Leaky bucket</td><td class="num">4</td><td class="num">8</td><td class="num">7</td><td class="num">7</td><td><span class="ux-badge">smooths, no burst</span></td></tr>
+      </tbody>
+    </table></div></div>
+    <p class="ux-prose" style="font-size:13px;color:var(--text-dim);margin-top:10px">Scores are a reasoned ranking, not a benchmark — directional, for choosing between shapes. Click a column to re-rank.</p>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-grid ux-cols-2" style="align-items:start">
+      <div>
+        <div class="ux-section-title">Why it wins</div>
+        <p class="ux-prose">A token bucket holds a small reserve, so a client that's been quiet can spend a short burst — exactly what a paginating client or a ret‑storm does — then settles to the refill rate. Steady traffic under the rate never sees a 429.</p>
+      </div>
+      <div>
+        <div class="ux-section-title">When to pick another</div>
+        <p class="ux-prose">Need byte-exact accounting for billing? <span class="ux-strong">Sliding-window log</span>, and pay the memory. Shaping a queue to a constant drain rate? <span class="ux-strong">Leaky bucket</span>. <span class="ux-strong">Fixed window</span> only when simplicity outranks correctness — its boundary lets through 2× at the seam.</p>
+      </div>
+    </div>
+  </section>
+
+</div>

@@ -1,5 +1,5 @@
 ---
-description: Generate a self-contained Aurora slide deck (full-viewport, keyboard/scroll nav)
+description: Generate a self-contained slide deck (full-viewport, keyboard/scroll nav)
 argument-hint: [topic / source to present]
 ---
 

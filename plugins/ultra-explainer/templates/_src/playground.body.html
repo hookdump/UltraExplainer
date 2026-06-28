@@ -1,0 +1,80 @@
+<!--ux: {"title":"Where a cache earns its keep — UltraExplainer","preset":"blueprint","theme":"light","head":"<style>.pg{display:grid;gap:24px}@media(min-width:780px){.pg{grid-template-columns:310px 1fr;align-items:start;gap:38px}}.pg-bar{margin:14px 0 18px}.pg-bar h4{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);margin:0 0 7px;display:flex;justify-content:space-between}.bar-track{height:30px;background:var(--recessed);border:1px solid var(--hairline);border-radius:6px;position:relative;overflow:hidden}.bar-track::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent 0,transparent 9px,var(--hairline) 9px,var(--hairline) 10px);opacity:.5}.bar-fill{position:relative;height:100%;background:var(--accent);width:50%;transition:width .3s var(--ease);z-index:1}.bar-fill--load{background:var(--warn)}.pg-set{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}.pg-set button{font-family:var(--font-mono);font-size:12px;background:var(--surface-2);border:1px solid var(--hairline);color:var(--text);border-radius:999px;padding:6px 13px;cursor:pointer}.pg-set button:hover{border-color:var(--accent);color:var(--accent)}.pg-sli{margin:16px 0}</style>"} -->
+<div class="ux-wrap">
+
+  <header>
+    <span class="ux-kicker">Capacity model · <span class="ux-strong">illustrative</span></span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">A cache's whole job is the <span class="lit">last few points</span> of hit rate — drag the slider and watch the p50 fall off a cliff.</h1>
+    <p class="ux-lede ux-rise" style="--i:1">An interactive model, not a measurement. The relationship is exact arithmetic; the <em>numbers</em> you feed it are yours. Move the controls — every readout updates from one formula.</p>
+  </header>
+
+  <section class="ux-section">
+    <div data-playground data-derive="cacheModel" class="pg">
+
+      <div class="ux-control">
+        <div class="ux-label ux-label--accent" style="margin-bottom:14px">Tuning</div>
+
+        <div class="ux-slider pg-sli">
+          <label for="pg-hit">Hit rate</label>
+          <input id="pg-hit" type="range" data-param="hit" min="0.50" max="0.99" step="0.01" value="0.85">
+          <output data-out="hit" data-fmt="pct">85%</output>
+        </div>
+        <div class="ux-slider pg-sli">
+          <label for="pg-cache">Cache read</label>
+          <input id="pg-cache" type="range" data-param="cacheMs" min="1" max="10" step="1" value="2">
+          <output data-out="cacheMs" data-fmt="ms">2ms</output>
+        </div>
+        <div class="ux-slider pg-sli">
+          <label for="pg-db">DB read</label>
+          <input id="pg-db" type="range" data-param="dbMs" min="20" max="200" step="5" value="80">
+          <output data-out="dbMs" data-fmt="ms">80ms</output>
+        </div>
+
+        <div class="ux-label" style="margin:18px 0 6px">Jump to</div>
+        <div class="pg-set">
+          <button data-set='{"hit":0.55}'>cold start</button>
+          <button data-set='{"hit":0.85}'>steady</button>
+          <button data-set='{"hit":0.97}'>hot</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="ux-kpis" style="margin-bottom:8px">
+          <div class="ux-panel ux-kpi ux-kpi--focus"><div class="ux-kpi__val"><span data-show="speedup" data-fmt="x">5.6×</span></div><div class="ux-kpi__label">Faster than uncached</div></div>
+          <div class="ux-panel ux-kpi"><div class="ux-kpi__val"><span data-show="avgMs" data-fmt="ms">13ms</span></div><div class="ux-kpi__label">Effective p50 read</div></div>
+          <div class="ux-panel ux-kpi ux-kpi--down"><div class="ux-kpi__val"><span data-show="perK" data-fmt="int">150</span></div><div class="ux-kpi__label">DB reads / 1k requests</div></div>
+        </div>
+
+        <div class="pg-bar">
+          <h4><span>Effective read latency</span><span><span data-show="avgMs" data-fmt="ms">13ms</span> of <span data-show="dbMs" data-fmt="ms">80ms</span> uncached</span></h4>
+          <div class="bar-track"><div class="bar-fill" data-fill="avgFill" data-fill-w style="width:16%"></div></div>
+        </div>
+        <div class="pg-bar">
+          <h4><span>Traffic still reaching the database</span><span data-show="dbLoad" data-fmt="pct">15%</span></h4>
+          <div class="bar-track"><div class="bar-fill bar-fill--load" data-fill="dbLoadFill" data-fill-w style="width:15%"></div></div>
+        </div>
+
+        <div class="ux-callout">
+          <strong>The model.</strong> <code>p50 = hit · cache_read + (1 − hit) · db_read</code>. At 85% the misses still dominate the average — which is why pushing hit rate from 85% to 97% does far more than shaving milliseconds off the cache itself. Plug in your own measured latencies before trusting a number.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script>
+window.cacheModel = function (s) {
+  var hit = +s.hit, cacheMs = +s.cacheMs, dbMs = +s.dbMs;
+  var avg = hit * cacheMs + (1 - hit) * dbMs;
+  var dbLoad = 1 - hit;
+  return {
+    avgMs: avg,
+    avgFill: Math.min(1, avg / dbMs),
+    dbLoad: dbLoad,
+    dbLoadFill: dbLoad,
+    speedup: dbMs / avg,
+    perK: Math.round(dbLoad * 1000)
+  };
+};
+</script>

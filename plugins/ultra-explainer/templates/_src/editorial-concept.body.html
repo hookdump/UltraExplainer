@@ -1,0 +1,97 @@
+<!--ux: {"title":"Consistent hashing — UltraExplainer","preset":"editorial","theme":"light","head":"<style>.ring-fig{display:block;margin:0 auto;max-width:340px;width:100%}.ring-node{fill:var(--accent)}.ring-node-lab{font-family:var(--font-mono);font-size:11px;fill:var(--bg);font-weight:700}.ring-key{fill:var(--text-dim)}.ring-key--hot{fill:var(--accent-2)}.ring-circle{fill:none;stroke:var(--hairline-strong);stroke-width:2}.ring-arc{fill:none;stroke:var(--accent-2);stroke-width:2.5}.ring-cap{font-family:var(--font-mono);font-size:10.5px;fill:var(--text-faint)}.fig-note{font-family:var(--font-mono);font-size:11px;color:var(--text-faint);text-align:center;margin-top:8px}section[id]{scroll-margin-top:24px}</style>"} -->
+<div class="ux-wrap">
+
+  <header>
+    <span class="ux-kicker">Distributed systems · explainer</span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">Adding one cache server shouldn't move <span class="lit">every</span> key. Consistent hashing is the trick that makes it move <span class="lit lit--grad">almost none</span> of them.</h1>
+    <p class="ux-lede ux-rise" style="--i:1">The naïve way to shard by key — <code>hash(key) % N</code> — has a brutal failure mode: change <code>N</code> and nearly every key lands somewhere new. For a cache, that's a stampede. Here's the idea that fixes it, and what it costs.</p>
+  </header>
+
+  <div class="ux-haslayout">
+    <nav class="ux-nav" aria-label="Sections">
+      <a href="#problem">The mod-N trap</a>
+      <a href="#idea">The ring</a>
+      <a href="#walk">Reading a key</a>
+      <a href="#rebalance">Adding a node</a>
+      <a href="#cost">What it costs</a>
+    </nav>
+
+    <div>
+      <section id="problem" class="ux-section">
+        <div class="ux-section-title">The mod-N trap</div>
+        <p class="ux-prose">Shard a key with <code>server = hash(key) % N</code> and everything works — until <code>N</code> changes. Go from 4 servers to 5 and you haven't moved a fifth of the keys; you've moved roughly <span class="ux-strong">four-fifths</span> of them, because the modulus rewrites almost every result at once.</p>
+        <div class="ux-compare" style="margin-top:18px">
+          <div class="ux-compare__side ux-compare__side--before">
+            <span class="ux-compare__tag">what you'd expect</span>
+            <p class="ux-prose">"Add a server, ~20% of keys relocate to it." Reasonable — and wrong.</p>
+          </div>
+          <div class="ux-compare__side ux-compare__side--after">
+            <span class="ux-compare__tag">what actually happens</span>
+            <p class="ux-prose"><code>k % 4</code> and <code>k % 5</code> agree for only a handful of keys. The cache empties almost completely and every miss hits the origin at once.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="idea" class="ux-section">
+        <div class="ux-section-title">Put the servers on a ring</div>
+        <div class="ux-sidenote-layout">
+          <div>
+            <p class="ux-prose">Hash the <em>servers</em> onto a circle of hash values, not just the keys. Now both live in the same space: a server sits at <code>hash(server)</code>, a key sits at <code>hash(key)</code>, both points on one ring from 0 to 2<sup>32</sup>.</p>
+            <p class="ux-prose">A key belongs to the <span class="ux-strong">first server you meet walking clockwise</span> from where the key landed. That single rule is the whole mechanism — no modulus, no global <code>N</code>.</p>
+          </div>
+          <aside class="ux-sidenote"><span class="ux-strong">Why a circle?</span> So there's always a "next" server — walk clockwise past the top and you wrap to the lowest-valued server. No key ever falls off the end.</aside>
+        </div>
+
+        <figure style="margin:26px 0 0">
+          <svg class="ring-fig" viewBox="0 0 280 280" role="img" aria-label="A hash ring with four servers; a key maps clockwise to the next server.">
+            <circle class="ring-circle" cx="140" cy="140" r="100"></circle>
+            <!-- servers at top, right, bottom, left -->
+            <circle class="ring-node" cx="140" cy="40" r="15"></circle><text class="ring-node-lab" x="140" y="44" text-anchor="middle">S1</text>
+            <circle class="ring-node" cx="240" cy="140" r="15"></circle><text class="ring-node-lab" x="240" y="144" text-anchor="middle">S2</text>
+            <circle class="ring-node" cx="140" cy="240" r="15"></circle><text class="ring-node-lab" x="140" y="244" text-anchor="middle">S3</text>
+            <circle class="ring-node" cx="40" cy="140" r="15"></circle><text class="ring-node-lab" x="40" y="144" text-anchor="middle">S4</text>
+            <!-- keys -->
+            <circle class="ring-key" cx="140" cy="240" r="0"></circle>
+            <circle class="ring-key" cx="216.6" cy="76.6" r="5"></circle>
+            <circle class="ring-key--hot" cx="204" cy="63.4" r="6"></circle>
+            <circle class="ring-key" cx="76.6" cy="216.6" r="5"></circle>
+            <circle class="ring-key" cx="63.4" cy="76.6" r="5"></circle>
+            <!-- arc from hot key (theta 40) clockwise to S2 (theta 90) -->
+            <path class="ring-arc" d="M 204 63.4 A 100 100 0 0 1 240 140" marker-end="url(#ring-ar)"></path>
+            <defs><marker id="ring-ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="var(--accent-2)"></path></marker></defs>
+            <text class="ring-cap" x="198" y="52" text-anchor="end">key</text>
+          </svg>
+          <figcaption class="fig-note">A key lands on the ring, then travels clockwise to the next server — here, S2.</figcaption>
+        </figure>
+      </section>
+
+      <section id="walk" class="ux-section">
+        <div class="ux-section-title">Reading a key</div>
+        <ol class="ux-spine">
+          <li class="ux-spine__node"><span class="ux-strong">Hash the key</span> to a point on the ring — same hash function, same 0…2<sup>32</sup> space as the servers.</li>
+          <li class="ux-spine__node"><span class="ux-strong">Walk clockwise</span> until you hit a server marker. In practice this is a binary search over a sorted list of server positions — O(log N), not O(N).</li>
+          <li class="ux-spine__node"><span class="ux-strong">That server owns the key.</span> Every node runs the identical lookup, so they all agree without coordinating.</li>
+        </ol>
+      </section>
+
+      <section id="rebalance" class="ux-section">
+        <div class="ux-panel ux-panel--focal">
+          <div class="ux-eyebrow">The payoff</div>
+          <p class="ux-h3" style="margin:6px 0 0">Add a 5th server and only the keys in <span class="lit">one arc</span> move — the slice between the new server and its clockwise predecessor.</p>
+          <p class="ux-prose" style="margin-top:10px">Every other key still meets the same server it always did. Instead of relocating ~80% of keys, you relocate on the order of <code>1/N</code> of them. Removing a server is the mirror image: only its arc spills over to the next node clockwise. The cache stays warm.</p>
+        </div>
+      </section>
+
+      <section id="cost" class="ux-section">
+        <div class="ux-section-title">What it costs</div>
+        <p class="ux-prose">Consistent hashing isn't free, and the honest version names the catch:</p>
+        <ul class="ux-prose">
+          <li>With few servers, random placement makes arcs <span class="ux-strong">uneven</span> — one node can own twice its share. The standard fix is <em>virtual nodes</em>: hash each server to many ring points so the load averages out.</li>
+          <li>It balances <em>key count</em>, not <em>key heat</em>. A single hot key still lands on one node; consistent hashing won't save you from that.</li>
+        </ul>
+        <div class="ux-callout ux-callout--good" style="margin-top:16px"><strong>The one-line version.</strong> Hash servers and keys into the same ring; a key belongs to the next server clockwise. Membership changes then disturb one arc instead of the whole map — which is exactly the property a cache, a shard map, or a DHT needs.</div>
+      </section>
+    </div>
+  </div>
+
+</div>

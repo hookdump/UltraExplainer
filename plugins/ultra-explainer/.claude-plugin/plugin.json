@@ -1,7 +1,7 @@
 {
   "name": "ultra-explainer",
-  "description": "Turn code, systems, diffs, and plans into strikingly clear self-contained HTML — node-edge graphs with routed arrows, annotated diffs, dashboards, timelines, slides, and custom SVG illustrations. Futuristic 'Aurora' design system with an optional glow layer (toggle on/off) and light/dark themes.",
-  "version": "0.1.0",
+  "description": "Turn code, systems, diffs, plans, data, and concepts into strikingly clear self-contained HTML — re-skinned by a 'chameleon studio' of seven distinct design languages (blueprint, editorial, terminal, instrument, notebook, swiss, luminous) chosen to fit the subject. Node-edge graphs, annotated diffs, honest charts, interactive models, step-throughs, themed Mermaid, slides; light/dark themes and an optional glow layer.",
+  "version": "0.2.0",
   "author": {
     "name": "hookdump",
     "url": "https://github.com/hookdump"
@@ -18,6 +18,10 @@
     "slides",
     "mermaid",
     "dashboard",
-    "code-explanation"
+    "code-explanation",
+    "interactive",
+    "explorable",
+    "teaching",
+    "design-system"
   ]
 }

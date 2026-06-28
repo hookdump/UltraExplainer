@@ -1,5 +1,5 @@
 ---
-description: Generate self-contained Aurora HTML visual explanations (UltraExplainer)
+description: Generate self-contained HTML visual explanations (UltraExplainer)
 globs:
 alwaysApply: false
 ---
@@ -7,7 +7,7 @@ alwaysApply: false
 When the user asks for a diagram, architecture overview, diff/PR review, plan review, dashboard, comparison table, slide deck, project recap, or any visual explanation, produce a **single self-contained HTML file** with the UltraExplainer skill rather than ASCII art or Markdown tables.
 
 - Read `plugins/ultra-explainer/SKILL.md` and the relevant `plugins/ultra-explainer/references/*.md`.
-- Start from the closest `plugins/ultra-explainer/templates/*.html`; inline `assets/aurora.css` + `assets/aurora.js` (escape literal `</script>` as `<\/script>`).
-- Reason with the synthesis method (thesis-with-tension, evidence anchors, salience tiers T0≤3/T1≤7/T2-hidden, lowest-ink representation, first-viewport gate, self-audit).
-- The Aurora system has light/dark + an optional glow toggle; keep glow budgeted and never draw structure not present in the source.
+- Start from the closest body in `plugins/ultra-explainer/templates/_src/`; build with `node scripts/build.mjs <name>` (inlines `core.css` + `themes.css` + `ux.js`; literal `</script>` is escaped as `<\/script>`).
+- Reason with the synthesis method (thesis-with-tension, evidence anchors, salience tiers T0≤3/T1≤7/T2-hidden, choose a design language, lowest-ink/manipulable representation, first-viewport gate, the TRUTH/CRAFT/OBSERVED gates).
+- It's a chameleon studio: pick one of seven languages (Blueprint, Editorial, Terminal, Instrument, Notebook, Swiss, Luminous) for the subject. Light/dark always toggle; glow is Luminous-only. Never draw structure not present in the source.
 - Write the file and tell the user the path.

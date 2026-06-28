@@ -300,6 +300,45 @@ Run before delivery. Every line must pass.
 - **QUANTITATIVE HONESTY** — magnitudes encoded by size/length/position (not equal boxes); metrics show source + as-of date; code/signatures/error strings verbatim with marked elisions.
 - **REPRESENTATION FIT** — each beat uses the form that makes the THESIS fastest to grasp (e.g. hot path emphasized), routed on cognitive job not content-type default; one primary representation per spine + at most one secondary; no decorative duplicate diagram.
 - **COMPRESSION** — every kept element earns its pixels; repetition collapsed to exemplars; plumbing elided; full-tree/all-configs dumps confined to T2 or omitted; thesis + all caveats intact.
-- **CRAFT (artifact-design)** — self-contained HTML, deliberate subject-grounded palette + type pairing (no AI-default looks, no webfont CDN), hierarchy mirrors salience tiers, layout via grid/flex gap, wide content in its own overflow-x container (body never scrolls sideways), tabular-nums for aligned digits, Mermaid/SVG shell with zoom/pan/expand, prefers-reduced-motion respected, visible keyboard focus, no console errors, no horizontal overflow.
+- **CRAFT (artifact-design)** — self-contained HTML, deliberate subject-grounded palette + type pairing (no AI-default looks; webfonts load from a CDN but every face has a full system fallback stack, so they are never a dependency), the chosen design language passes the squint test, hierarchy mirrors salience tiers, layout via grid/flex gap, wide content in its own overflow-x container (body never scrolls sideways), tabular-nums for aligned digits, Mermaid/SVG shell with zoom/pan/expand, prefers-reduced-motion respected, visible keyboard focus, no console errors, no horizontal overflow.
 - **AUDITS PASSED** — in-loop TRUTH pass (12A) and NARRATIVE pass (12B) both completed before delivery; FIRST-VIEWPORT gate passes all 4 questions (state thesis / one focal point / focal point proves-or-sets-up thesis / visible reason to scroll).
 - **HONESTY OVER POLISH** — where verification failed, the page says so; no confident fabrication anywhere; no decorative provenance footer — provenance is per-claim in the ledger and inline anchors.
+
+---
+
+## v2 layer — what wraps the pipeline above
+
+The pipeline is unchanged and remains the differentiator. v2 adds five steps **around** it; none weaken the evidence gate.
+
+### A. Mode switch (at the charter, step 1)
+
+Add a fifth charter field, **MODE**:
+
+- **EXPLAIN** (default) — thesis-first, for reviewers / decision-makers / context-switchers who need the conclusion fast. The salience caps (T0 ≤ 3, T1 ≤ 7) and the first-viewport gate apply as written.
+- **TEACH** — question-first, for learners who need a *runnable mental model*. Same evidence spine, different arc: concrete-before-abstract, a first-**question** gate (the cold reader feels a specific curiosity, not a handed conclusion), a desirable-difficulty budget instead of the skim caps, and a closing transfer/exit-ticket. Build a parallel **learner-state** artifact (prior-knowledge floor, the audience's likely *current/wrong* model, misconceptions to pre-empt). See `references/teaching.md`.
+
+State the chosen mode in chat so the user can correct it.
+
+### B. Aesthetic-selection (after thesis + representation are fixed, before render)
+
+Choosing the design language is a reasoned charter field, not a vibe. Score the seven languages on **subject × audience × medium × implied tone** and record one auditable line:
+
+`LANGUAGE: <name> because <subject + audience + medium>`
+
+Tie-breakers: honor explicit user requests; rotate to avoid session monotony; **never default to Luminous because it's flashy.** Full scorecard in `references/aesthetic-languages.md`.
+
+### C. Manipulability question (top of representation routing, step 8)
+
+Before the content-type lookup, ask: **"Is there a relationship the reader should *feel* by changing an input?"** If yes, the default is a parameter model / step-through / scenario toggle; static forms become the fallback for genuinely static truths. Interactivity must **earn its keep** — never manufacture a slider for a one-sentence answer. See `references/interactivity.md` and `references/representations.md`.
+
+### D. Interaction-as-evidence (extends anchor-or-omit, step 3)
+
+Every slider range/default and every input→output **function** must trace to a `const`/config/measured curve, or be stamped **"illustrative model, not measured."** Charts carry a numbers ledger (value + unit + source + as-of) and obey axis honesty (zero baseline unless justified, no dual-axis, label endpoints, never invent coordinates). An interactive lie is worse than a static one. For jobs with no codebase (teaching, data-from-a-doc), cite the given dataset/section and mark given-vs-inferred. See `references/charts-honesty.md`.
+
+### E. Three gates (replace the implicit craft notion, step 12)
+
+Before delivering, pass all three — **truth wins every tie**:
+
+- **TRUTH** — the audit above (re-walked ledger, hedged inferences, no invented structure, honest interaction).
+- **CRAFT** — the squint test: reads as a deliberate design language, not a recolored template; exactly one T0 focal point.
+- **OBSERVED** — you actually rendered the page and looked (headless screenshot at ~1280 and ~360, console-error capture, no-horizontal-scroll + thesis-in-first-viewport assertions), then self-corrected. No checklist theater. See the verification loop in `references/self-contained.md`.

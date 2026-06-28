@@ -1,7 +1,7 @@
 {
   "name": "ultra-explainer",
-  "version": "0.1.0",
-  "description": "Agent skill that turns code, systems, diffs, and plans into strikingly clear self-contained HTML visual explanations — graphs with routed arrows, annotated diffs, dashboards, timelines, slides, and custom SVG illustrations. Futuristic 'Aurora' design system, glow optional.",
+  "version": "0.2.0",
+  "description": "Agent skill that turns code, systems, diffs, plans, data, and concepts into strikingly clear self-contained HTML — re-skinned by a chameleon studio of seven distinct design languages chosen to fit the subject. Node-edge graphs, annotated diffs, honest charts, interactive models, step-throughs, themed Mermaid, slides; light/dark themes, glow optional.",
   "license": "MIT",
   "homepage": "https://github.com/hookdump/UltraExplainer#readme",
   "repository": {

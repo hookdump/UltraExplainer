@@ -1,4 +1,4 @@
-<!--ux: {"title":"Slides — Edge Gateway Migration (UltraExplainer)","fonts":true} -->
+<!--ux: {"title":"Slides — Edge Gateway Migration (UltraExplainer)","preset":"luminous","theme":"dark","fonts":true} -->
 <div class="ux-deck">
 
   <!-- 1 · TITLE -->
@@ -19,7 +19,7 @@
   <section class="ux-slide slide--split">
     <div class="s-cols">
       <div>
-        <p class="s-sub reveal" style="color:var(--remove)">Before</p>
+        <p class="s-sub reveal" style="color:var(--bad)">Before</p>
         <h2 class="s-h reveal" style="margin:10px 0 4px">Monolith proxy</h2>
         <ul class="s-bullets">
           <li class="reveal">All traffic through one Node process</li>
@@ -29,7 +29,7 @@
         </ul>
       </div>
       <div>
-        <p class="s-sub reveal" style="color:var(--green-bright)">After</p>
+        <p class="s-sub reveal" style="color:var(--good)">After</p>
         <h2 class="s-h reveal" style="margin:10px 0 4px">Edge-native</h2>
         <ul class="s-bullets">
           <li class="reveal">Workers at 340 edge locations</li>
@@ -72,7 +72,7 @@ flowchart LR
   <section class="ux-slide">
     <h2 class="s-h reveal" style="margin-bottom:24px">What it bought us</h2>
     <div class="s-kpis">
-      <div class="ux-panel ux-kpi ux-kpi--focus ux-kpi--cyan reveal"><div class="ux-kpi__val">12ms</div><div class="ux-kpi__label">P99 latency</div><div class="ux-kpi__trend ux-kpi__trend--up">↓ from 142ms</div></div>
+      <div class="ux-panel ux-kpi ux-kpi--focus reveal"><div class="ux-kpi__val">12ms</div><div class="ux-kpi__label">P99 latency</div><div class="ux-kpi__trend ux-kpi__trend--up">↓ from 142ms</div></div>
       <div class="ux-panel ux-kpi reveal"><div class="ux-kpi__val">99.97%</div><div class="ux-kpi__label">Uptime</div><div class="ux-kpi__trend ux-kpi__trend--up">↑ from 99.2%</div></div>
       <div class="ux-panel ux-kpi reveal"><div class="ux-kpi__val">−68%</div><div class="ux-kpi__label">Cost / 10k req</div><div class="ux-kpi__trend">$0.02 each</div></div>
     </div>
@@ -87,7 +87,7 @@ flowchart LR
 
   <!-- 8 · CTA -->
   <section class="ux-slide slide--title">
-    <p class="s-sub reveal" style="color:var(--cyan-soft)">Next step</p>
+    <p class="s-sub reveal" style="color:var(--accent-2)">Next step</p>
     <h2 class="s-display reveal" style="font-size:clamp(36px,6vw,76px);margin:16px 0">Ship <span class="lit">shadow mode</span> this week</h2>
     <p class="s-sub reveal" style="color:var(--text-faint)">Full cutover targeted for end of quarter</p>
   </section>

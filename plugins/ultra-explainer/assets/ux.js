@@ -42,9 +42,10 @@
       glowBtn.innerHTML = (on ? "✦ glow" : "○ flat");
       glowBtn.setAttribute("aria-pressed", String(on));
     }
+    var preset = root.dataset.themePreset || "luminous";
     themeBtn.addEventListener("click", function () {
       var next = root.dataset.theme === "light" ? "dark" : "light";
-      root.dataset.theme = next; try { localStorage.setItem("ux-theme", next); } catch (e) {}
+      root.dataset.theme = next; try { localStorage.setItem("ux-theme-" + preset, next); } catch (e) {}
       syncTheme(); redrawGraphs();
     });
     glowBtn.addEventListener("click", function () {
@@ -53,8 +54,10 @@
       try { localStorage.setItem("ux-fx", root.dataset.fx); } catch (e) {}
       syncGlow();
     });
-    syncTheme(); syncGlow();
-    bar.appendChild(themeBtn); bar.appendChild(glowBtn);
+    syncTheme();
+    bar.appendChild(themeBtn);
+    // glow/flat toggle is meaningful only in the Luminous design language
+    if (preset === "luminous") { syncGlow(); bar.appendChild(glowBtn); }
     doc.body.appendChild(bar);
   }
 
@@ -64,10 +67,11 @@
          <svg class="ux-graph__edges"></svg>
          <div class="ux-graph__layer" style="grid-template-...">…nodes with id…</div>
          <script type="application/json" class="ux-edges">
-           [{"from":"n-a","to":"n-b","color":"cyan","dashed":false}]
+           [{"from":"n-a","to":"n-b","color":"accent","dashed":false,"cls":"e-x"}]
          <\/script>
        </div>
-     color: edge | azure | cyan | green | violet
+     color: edge | accent | accent2 | good | meta  (any non-"edge" colour also gets .is-glow)
+     optional per-edge: "dashed":true, "cls":"<class>" and "id":"<id>" for scenario/CSS targeting
   */
   var SVGNS = "http://www.w3.org/2000/svg";
   var graphs = [];
@@ -110,8 +114,9 @@
     ensureMarker(svg);
     var paths = edges.map(function (ed) {
       var p = doc.createElementNS(SVGNS, "path");
-      p.setAttribute("class", "ux-epath ux-epath--" + (ed.color || "edge") + (ed.color && ed.color !== "edge" ? " is-glow" : ""));
+      p.setAttribute("class", "ux-epath ux-epath--" + (ed.color || "edge") + (ed.color && ed.color !== "edge" ? " is-glow" : "") + (ed.cls ? " " + ed.cls : ""));
       p.setAttribute("marker-end", "url(#ux-arrow)");
+      if (ed.id) p.id = ed.id;
       if (ed.dashed) p.setAttribute("stroke-dasharray", "5 6");
       svg.appendChild(p); return { ed: ed, el: p };
     });
@@ -217,12 +222,131 @@
     addEventListener("resize", function () { size(); seed(); });
   }
 
+  /* ---------------- Explorable model: state -> derive -> render ----------------
+     <div data-playground data-derive="myDerive">
+       <script type="application/json" class="ux-state">{"n":1000}<\/script>
+       <input type="range" data-param="n" min="100" max="9000" step="100"><output data-out="n"></output>
+       <b data-show="cost" data-fmt="money"></b>  <span data-fill="load"></span>
+     window.myDerive = function(s){ return { cost: s.n*0.004, load: s.n/9000 }; }  */
+  var FMT = {
+    int: function (v) { return Math.round(v).toLocaleString(); },
+    pct: function (v) { return (v * 100).toFixed(0) + "%"; },
+    pct1: function (v) { return (v * 100).toFixed(1) + "%"; },
+    ms: function (v) { return Math.round(v) + "ms"; },
+    x: function (v) { return v.toFixed(1) + "×"; },
+    money: function (v) { return "$" + (Math.round(v * 100) / 100).toLocaleString(); },
+    raw: function (v) { return String(v); },
+  };
+  function initPlayground(host) {
+    var stateEl = host.querySelector(".ux-state");
+    var state = {}; if (stateEl) { try { state = JSON.parse(stateEl.textContent); } catch (e) {} }
+    var derive = host.dataset.derive && window[host.dataset.derive] ? window[host.dataset.derive] : function (s) { return s; };
+    function render() {
+      var out = derive(Object.assign({}, state)) || {};
+      var all = Object.assign({}, state, out);
+      host.querySelectorAll("[data-show]").forEach(function (el) {
+        var k = el.dataset.show; if (!(k in all)) return;
+        el.textContent = (FMT[el.dataset.fmt] || FMT.raw)(all[k]);
+      });
+      host.querySelectorAll("[data-fill]").forEach(function (el) {
+        var v = all[el.dataset.fill]; if (v == null) return;
+        el.style.setProperty("--v", Math.max(0, Math.min(1, +v)));
+        if (el.hasAttribute("data-fill-h")) el.style.height = (Math.max(0, Math.min(1, +v)) * 100) + "%";
+        if (el.hasAttribute("data-fill-w")) el.style.width = (Math.max(0, Math.min(1, +v)) * 100) + "%";
+      });
+    }
+    host.querySelectorAll("[data-param]").forEach(function (inp) {
+      var k = inp.dataset.param; var o = host.querySelector('[data-out="' + k + '"]');
+      function sync() { state[k] = inp.type === "range" || inp.type === "number" ? +inp.value : inp.value; if (o) o.textContent = (FMT[o.dataset.fmt] || FMT.raw)(state[k]); render(); }
+      inp.addEventListener("input", sync); sync();
+    });
+    host.querySelectorAll("[data-set]").forEach(function (btn) {
+      btn.addEventListener("click", function () { try { Object.assign(state, JSON.parse(btn.dataset.set)); } catch (e) {}
+        host.querySelectorAll("[data-param]").forEach(function (i) { if (i.dataset.param in state) { i.value = state[i.dataset.param]; var o = host.querySelector('[data-out="' + i.dataset.param + '"]'); if (o) o.textContent = (FMT[o.dataset.fmt] || FMT.raw)(state[i.dataset.param]); } });
+        render(); });
+    });
+    render();
+  }
+
+  /* ---------------- Scenario segmented control: sets data-scenario on a target ---------------- */
+  function initScenarios(seg) {
+    var target = seg.dataset.target ? doc.querySelector(seg.dataset.target) : seg.closest("[data-scenario-root]") || doc.body;
+    var btns = [].slice.call(seg.querySelectorAll("button"));
+    btns.forEach(function (b) { b.addEventListener("click", function () {
+      btns.forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); });
+      target.dataset.scenario = b.dataset.scenario;
+      if (window.Ultra) window.Ultra.redrawGraphs();
+    }); });
+  }
+
+  /* ---------------- Step-through player ---------------- */
+  function initStepper(host) {
+    var stepsEl = host.querySelector(".ux-steps"); var steps = [];
+    if (stepsEl) { try { steps = JSON.parse(stepsEl.textContent); } catch (e) {} }
+    if (!steps.length) return;
+    var cap = host.querySelector("[data-step-cap]");
+    var code = host.dataset.code ? doc.querySelector(host.dataset.code) : host.querySelector(".ux-codeblock");
+    var counter = host.querySelector("[data-step-n]");
+    var i = 0;
+    function show() {
+      var s = steps[i] || {};
+      if (cap) cap.innerHTML = s.cap || "";
+      if (counter) counter.textContent = (i + 1) + " / " + steps.length;
+      if (code) { var lines = code.querySelectorAll(".l"); lines.forEach(function (l, n) { l.classList.toggle("is-active", (s.lines || []).indexOf(n + 1) > -1); }); }
+      host.querySelectorAll("[data-step-show]").forEach(function (el) { el.hidden = +el.dataset.stepShow !== i; });
+      if (s.scenario && code) {}
+    }
+    host.querySelectorAll("[data-step]").forEach(function (b) { b.addEventListener("click", function () {
+      var a = b.dataset.step; if (a === "next") i = Math.min(i + 1, steps.length - 1); else if (a === "prev") i = Math.max(i - 1, 0); else if (a === "reset") i = 0; show();
+    }); });
+    doc.addEventListener("keydown", function (e) { if (!host.contains(doc.activeElement) && doc.activeElement !== doc.body) return;
+      if (e.key === "ArrowRight") { i = Math.min(i + 1, steps.length - 1); show(); } else if (e.key === "ArrowLeft") { i = Math.max(i - 1, 0); show(); } });
+    show();
+  }
+
+  /* ---------------- Sortable table ---------------- */
+  function initSortable(table) {
+    var ths = [].slice.call(table.querySelectorAll("th[data-sort]"));
+    ths.forEach(function (th, ci) {
+      th.addEventListener("click", function () {
+        var idx = [].slice.call(th.parentNode.children).indexOf(th);
+        var dir = th.getAttribute("aria-sort") === "ascending" ? "descending" : "ascending";
+        ths.forEach(function (x) { x.removeAttribute("aria-sort"); }); th.setAttribute("aria-sort", dir);
+        var numeric = th.dataset.sort === "num";
+        var body = table.tBodies[0]; var rows = [].slice.call(body.rows);
+        rows.sort(function (a, b) {
+          var av = a.cells[idx] ? a.cells[idx].textContent.trim() : "", bv = b.cells[idx] ? b.cells[idx].textContent.trim() : "";
+          if (numeric) { av = parseFloat(av.replace(/[^0-9.\-]/g, "")) || 0; bv = parseFloat(bv.replace(/[^0-9.\-]/g, "")) || 0; return dir === "ascending" ? av - bv : bv - av; }
+          return dir === "ascending" ? av.localeCompare(bv) : bv.localeCompare(av);
+        });
+        rows.forEach(function (r) { body.appendChild(r); });
+      });
+    });
+  }
+
+  /* ---------------- Scroll-spy section nav ---------------- */
+  function initNav() {
+    var nav = doc.querySelector(".ux-nav"); if (!nav) return;
+    var links = [].slice.call(nav.querySelectorAll("a[href^='#']"));
+    var map = {}; links.forEach(function (a) { var t = doc.getElementById(a.getAttribute("href").slice(1)); if (t) map[a.getAttribute("href").slice(1)] = a; });
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) { if (e.isIntersecting) { links.forEach(function (l) { l.classList.remove("is-active"); }); if (map[e.target.id]) { map[e.target.id].classList.add("is-active"); var act = map[e.target.id]; if (nav.scrollWidth > nav.clientWidth) act.scrollIntoView({ inline: "center", block: "nearest" }); } } });
+    }, { rootMargin: "-15% 0px -75% 0px" });
+    Object.keys(map).forEach(function (id) { var t = doc.getElementById(id); if (t) obs.observe(t); });
+    links.forEach(function (a) { a.addEventListener("click", function (e) { e.preventDefault(); var t = doc.getElementById(a.getAttribute("href").slice(1)); if (t) t.scrollIntoView({ behavior: "smooth" }); }); });
+  }
+
   /* ---------------- Boot ---------------- */
   function boot() {
     buildSwitcher();
     doc.querySelectorAll(".ux-graph").forEach(initGraph);
     doc.querySelectorAll(".ux-tabbar").forEach(initTabs);
+    doc.querySelectorAll("[data-playground]").forEach(initPlayground);
+    doc.querySelectorAll(".ux-seg[data-scenario-ctl]").forEach(initScenarios);
+    doc.querySelectorAll("[data-stepper]").forEach(initStepper);
+    doc.querySelectorAll("table.ux-table").forEach(function (t) { if (t.querySelector("th[data-sort]")) initSortable(t); });
     initFilters();
+    initNav();
     initField();
   }
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", boot);

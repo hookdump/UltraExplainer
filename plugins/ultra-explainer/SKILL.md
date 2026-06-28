@@ -1,118 +1,159 @@
 ---
 name: ultra-explainer
-description: Generate strikingly clear, self-contained HTML visual explanations of code, systems, diffs, plans, data, and concepts. Use for architecture diagrams, node-edge graphs, diff/PR reviews, plan reviews, dashboards, comparison tables, slide decks, project recaps, and concept explainers. Produces one self-contained .html file with the "Aurora" design system — node-edge graphs with routed arrows, annotated diffs, charts, custom SVG illustrations, and themed Mermaid — with an optional glow layer and light/dark themes the reader can toggle.
+description: Generate strikingly clear, self-contained HTML explanations of code, systems, diffs, plans, data, and concepts. Use for architecture & node-edge graphs, diff/PR reviews, plan/requirement audits, dashboards, comparison tables, concept explainers, interactive walkthroughs, slide decks, and project recaps. Produces one self-contained .html file built from a stable component contract re-skinned by a "chameleon studio" of seven distinct design languages (blueprint, editorial, terminal, instrument, notebook, swiss, luminous) chosen to fit the subject — with light/dark themes, an optional glow layer, and real interactivity (sliders, scenario toggles, step-throughs, sortable tables).
 license: MIT
 metadata:
   author: hookdump
-  version: "0.1.0"
+  version: "0.2.0"
   homepage: https://github.com/hookdump/UltraExplainer
 ---
 
 # UltraExplainer
 
-Turn code, systems, diffs, plans, data, and concepts into a single self-contained HTML page that makes the **one important idea** obvious in the first screenful — then proves it with anchored evidence. UltraExplainer is two things working together:
+Turn code, systems, diffs, plans, data, and concepts into a single self-contained HTML page that makes the **one important idea** obvious in the first screenful — then proves it with anchored evidence. UltraExplainer is three things working together:
 
 1. **A synthesis method** (the brain) — how to decide *what* to show, what to emphasize, what to cut, and how to never draw structure that isn't in the source. See `references/synthesis-method.md`.
-2. **The Aurora design system** (the craft) — a dark/light glass aesthetic with a rich visualization vocabulary (node-edge graphs with real routed arrows, annotated diffs, dashboards/charts, custom SVG illustrations, timelines, themed Mermaid). Glow is an **optional, toggleable layer**, not the point. See `references/design-system.md` and `references/components.md`.
+2. **The chameleon studio** (the craft) — a stable, design-language-agnostic **component contract** (`assets/core.css`) re-skinned by **seven complete design languages** (`assets/themes.css`). The same diff renders as an IDE gutter under *Terminal*, a ruled callout under *Blueprint*, a figure under *Editorial*. You **choose** the language to fit the subject; glow is one option (*Luminous*), never the default. See `references/aesthetic-languages.md` and `references/component-contract.md`.
+3. **An interactivity layer** (`assets/ux.js`) — one shared state→render engine powering sliders, scenario toggles, step-throughs, sortable/filterable tables, scroll-spy nav, and routed node-edge graphs. See `references/interactivity.md`.
 
-> Identity: **clarity + sophisticated visualization.** Not "everything glows," not "boxes-and-arrows soup," not "a wall of cards."
+> Identity: **truth + the right design language + verified craft.** Not "everything glows," not "boxes-and-arrows soup," not "a wall of identical cards."
 
 ## When to use this skill
 
-Reach for an HTML page whenever the output is inherently visual or relational and ASCII/Markdown would mangle it:
+Reach for an HTML page whenever the output is inherently visual, relational, or manipulable and ASCII/Markdown would mangle it:
 
 - A diagram, architecture overview, or **node-edge graph** of how something connects or flows.
 - A **diff / PR review** (changed code + why it matters + blast radius).
-- A **plan review** (requirements vs. implementation), audit, or comparison matrix.
+- A **plan / requirement audit** or comparison matrix.
 - A **dashboard** of metrics, or any table with 4+ rows / 3+ columns.
-- A **slide deck**, a **project recap** for context-switching, or a **concept explainer** that teaches a mechanism.
+- A **concept explainer** that teaches a mechanism, or an **interactive model** the reader should *feel* by changing an input.
+- A **slide deck**, or a **project recap** for context-switching.
 
-If the honest answer fits in one sentence or a single number, say it in chat — do **not** manufacture a page (see the minimum-viable-explainer rule in the method). When you do build, give a one-line chat summary and deliver the file.
+If the honest answer fits in one sentence or a single number, say it in chat — do **not** manufacture a page (the minimum-viable-explainer rule). When you do build, give a one-line chat summary and deliver the file.
 
-## Delivery rules
+## Two modes — decide at the charter
 
-- Output **one complete, self-contained HTML document** (`<!DOCTYPE html> … </html>`). Inline all CSS and JS.
-- Write it to the explicit eval/output path if given, else to `~/.agent/diagrams/<descriptive-name>.html` (or the current working dir if that's unavailable). Use a descriptive filename.
-- Open it in the browser when running interactively (`open` on macOS, `xdg-open` on Linux). Mention the path in chat.
-- The only external requests are Google Fonts and (when used) the Mermaid CDN. The page must still look right if those fail — fonts have system fallbacks and the layout never depends on them.
+State which one you're in (so the user can correct it):
 
-## How to build a page (assembly)
-
-Every page is assembled from the canonical assets so the look is consistent and the toggles work:
-
-1. `<head>`: the font links, then the **FOUC-free resolver** script (sets `data-theme` and `data-fx` before paint), then `<style>` with the full contents of `assets/aurora.css` inlined.
-2. `<body>`: `<div class="ux-field" aria-hidden="true"><canvas></canvas></div>` (the particle backdrop), then your content using `.ux-` components.
-3. Before `</body>`: `<script>` with `assets/aurora.js` inlined (it auto-builds the theme/glow switcher, wires the connector engine, tabs, filters, and the particle field).
-
-**The fastest path: copy a template from `templates/` and adapt it.** Each is a complete, self-contained example of one representation:
-
-| Template | Use for |
-|---|---|
-| `templates/architecture-graph.html` | systems, services, request flow — **node-edge graph with routed arrows** + hover-to-trace |
-| `templates/diff-review.html` | a code change: annotated diff + comment connector + verdict + blast radius |
-| `templates/dashboard.html` | metrics: focal-glow KPIs + area/bar/donut charts + table |
-| `templates/concept.html` | teaching a mechanism: **custom SVG illustration** + naive-vs-correct + worked example |
-| `templates/data-table.html` | audits, comparisons, requirement matrices: glass table + live filter + status badges |
-| `templates/mermaid.html` | flowcharts, sequence, state, ER, class — **themed Mermaid** with zoom/pan/expand |
-| `templates/slides.html` | a presentation: full-viewport deck with keyboard/scroll nav |
-
-> CRITICAL when inlining `aurora.js` (or any JS): escape every literal `</script>` inside it as `<\/script>` or it will close the tag early and dump source onto the page.
+- **EXPLAIN** (default) — thesis-first, for reviewers / decision-makers / context-switchers who need the conclusion fast. Salience caps apply (T0 ≤ 3, T1 ≤ 7).
+- **TEACH** — question-first, for learners who need a runnable mental model. Concrete-before-abstract, predict-then-reveal, ends with a transfer check. See `references/teaching.md`.
 
 ## The method, in brief
 
 Read `references/synthesis-method.md` before generating anything non-trivial. The short form:
 
-1. **Charter** — one sentence: "This explains *\<artifact\>* at altitude *\<A0–A4\>* for *\<audience\>* so they can *\<job\>*." Hold one altitude.
-2. **Thesis with tension** — one declarative claim the reader doesn't yet know (not a topic). Pick the spine (the single axis the eye follows: data-flow, control-flow, causal, temporal, dependency, comparison).
-3. **Evidence ledger** — read the real source; for every node/edge/label/number record `{claim, anchor (file:line / symbol / git ref / metric+date), confidence (verified|inferred|assumed)}`. **No anchor → it doesn't render as fact.**
+1. **Charter** — one sentence: "This explains *\<artifact\>* at altitude *\<A0–A4\>* for *\<audience\>* so they can *\<job\>*," plus the **mode** (EXPLAIN/TEACH). Hold one altitude.
+2. **Thesis with tension** — one declarative claim the reader doesn't yet know (not a topic). Pick the spine (the single axis the eye follows).
+3. **Evidence ledger** — read the real source; for every node/edge/label/number record `{claim, anchor (file:line / symbol / git ref / metric+date), confidence (verified|inferred|assumed)}`. **No anchor → it doesn't render as fact.** For interactive models, every slider range/default and the input→output **function** is anchored or stamped "illustrative model, not measured."
 4. **Reconcile** — hold the thesis against contradicting evidence; revise, scope, or *show* it. Never silently drop it.
 5. **Minimum-viable check** — don't over-render. Simple answer → hero sentence + one visual.
-6. **Salience tiering** — T0 (thesis + spine, **≤3**, the only tier that may glow) / T1 (load-bearing support, **≤7**) / T2 (receipts, hidden in `<details>`/hover). Over a cap → split the view or demote, **never shrink-to-fit**.
-7. **Represent** — pick the **lowest-ink form** that does the job (labeled list > flow strip > flowchart; KPI row > chart; table > prose). Encode magnitude *quantitatively* (size/length/position), not equal boxes.
-8. **Compress** — omission is the craft; collapse repetition ("×12 handlers"); excerpt the load-bearing lines, not whole files.
-9. **First-viewport gate** — a cold reader can restate the thesis from the first screen; exactly one focal point; a visible reason to scroll.
-10. **Self-audit** — re-open every anchor and confirm the page still matches; mark inferred/assumed with dashed/dotted/hedged language; hunt invented structure (fake layers, false symmetry, unattributed rationale).
+6. **Salience tiering** — T0 (thesis + spine, **≤3**) / T1 (load-bearing support, **≤7**) / T2 (receipts, in `<details>`/hover). Over a cap → split or demote, **never shrink-to-fit**. (TEACH mode swaps caps for a desirable-difficulty budget.)
+7. **Choose the design language** — score the 7 languages on subject × audience × medium and record one line: `LANGUAGE: <name> because <subject + audience + medium>`. See below.
+8. **Represent** — ask the **manipulability question first** ("should the reader *feel* a relationship by changing an input?"); if yes, reach for a model/stepper/scenario. Otherwise pick the **lowest-ink** static form. Encode magnitude *quantitatively* (size/length/position), not equal boxes.
+9. **Compress** — omission is the craft; collapse repetition ("×12 handlers"); excerpt the load-bearing lines, not whole files.
+10. **Gates** — pass all three before delivering (below).
+
+## Three delivery gates — truth outranks all
+
+- **TRUTH** — every node/edge/number traces to a real anchor; inferred/assumed content is visibly hedged; the thesis was reconciled against contradicting evidence; you re-opened the anchors. A clearly-marked "couldn't confirm X" beats a confident fabrication. An interactive lie (a slider scrubbing a fabricated relationship) is the cardinal sin.
+- **CRAFT** — the **squint test**: from across the room it reads as a deliberate design language, not a recolored template. Exactly one T0 focal point.
+- **OBSERVED** — you actually rendered the page and looked. Build it, open it (headless screenshot at ~1280 and ~360), capture console errors, assert no horizontal page scroll and that the thesis is in the first viewport, then self-correct. Stop asserting checklist properties you never measured.
+
+## How to build a page (assembly)
+
+Pages are assembled by `scripts/build.mjs` from a body fragment in `templates/_src/<name>.body.html`. **The fastest path: copy the closest template, change the `preset`, and adapt the content.**
+
+- **Line 1 directive** (JSON in an HTML comment) selects the language and tuning:
+  `<!--ux: {"title":"…","preset":"blueprint","theme":"light","fx":"flat","head":"<style>…</style>"} -->`
+  - `preset`: `blueprint | editorial | terminal | instrument | notebook | swiss | luminous` (default `luminous`)
+  - `presets: ["…","…"]` → emit one file per language (chameleon demos)
+  - `theme`: `light | dark` (defaults to the preset's natural tuning)
+  - `fx`: `glow | flat` (Luminous only)
+  - `head` / `foot`: extra markup; `<name>.head.html` / `<name>.foot.html` sidecars are also merged
+- The build inlines `core.css` + `themes.css` + `ux.js`, links the preset's fonts, sets `data-theme-preset` / `data-theme` / `data-fx` **before paint** (FOUC-free), and emits `templates/<name>.html`.
+- Run: `node scripts/build.mjs <name-filter>` (filter is a substring; omit to build all).
+- The page's only external requests are Google Fonts (with system fallbacks — the layout never depends on them) and, for Mermaid pages, the Mermaid CDN. It must still look right if those fail.
+
+> **CRITICAL** when inlining any JS that contains the literal string `</script>` (e.g. an example snippet): escape it as `<\/script>` or it closes the tag early and dumps source onto the page.
+
+## Choosing the design language
+
+Route on the merits, record the reason. Full scorecard + per-language profiles in `references/aesthetic-languages.md`.
+
+| Subject | Default language |
+|---|---|
+| Architecture, schemas, protocols, infra topology | **Blueprint** |
+| Concepts, ADRs, post-mortems, exec narratives | **Editorial** |
+| Diffs, PRs, CLI tools, CI pipelines, logs | **Terminal** |
+| Metrics, benchmarks, audits, dashboards | **Instrument** |
+| Teaching, walkthroughs, onboarding, gentle explainers | **Notebook** |
+| Comparisons, principle/manifesto pages, status reports | **Swiss** |
+| System-flow demos, product-vision, wow-factor briefs | **Luminous** (never by default) |
+
+Tie-breakers: honor explicit user requests ("make it a terminal"); rotate to avoid session monotony; **never pick Luminous just because it's flashy.**
 
 ## Choosing the representation
 
-Route on the cognitive job, not the content type:
+Route on the cognitive **job** and the **data shape**, not the content type. Manipulability first. Full catalog + routing in `references/representations.md`; honest charts in `references/charts-honesty.md`.
 
-| Content | Representation |
+| Job | Representation (component) |
 |---|---|
-| One dominant takeaway / yes-no | Typographic hero (thesis sentence large), optionally one diagram below |
-| True linear sequence (no branches) | Numbered list or single-axis flow strip — **not** a flowchart |
-| Branching / merging / cyclic flow | Node-edge graph (`architecture-graph`) or themed Mermaid; emphasize the hot path, dim the rest |
-| Code change / PR | `diff-review`: decisive hunks + plain-language delta + anchors + blast radius |
-| Bug / failure | Two-track timeline: expected vs actual, the divergence is the focal point |
-| Concept / misconception | `concept`: question → naive-vs-correct panels → one worked example → edge cases |
-| Architecture (relationships) | Small topology overview + detail cards; draw edges only where they exist in code |
-| State machine / lifecycle | Mermaid `stateDiagram` (≤8 states) or a state table |
-| Comparison / audit / matrix | `data-table`: semantic table, recommendation marked, one color language |
-| Metrics / quantitative | `dashboard`: lead with the delta KPI (units + source + date), then the leanest chart |
-| Plan / roadmap | current→target block, then a timeline; risky steps emphasized, each anchored or marked "proposal" |
-| Presentation | `slides` |
+| One dominant takeaway / yes-no | Typographic thesis hero (`.ux-thesis`), maybe one visual below |
+| Reader should *feel* a relationship | Parameter model (`[data-playground]`) — sliders + bound readouts |
+| Order / intermediate state is the meaning | Step-through (`[data-stepper]`) — code↔data in lockstep |
+| Behaves differently across configs | Scenario toggle (`.ux-seg[data-scenario-ctl]`) re-lights one diagram |
+| True linear sequence | Numbered list / flow strip (`.ux-spine`) — **not** a flowchart |
+| Branching / merging / cyclic flow | Node-edge graph (`.ux-graph`, ≤12 nodes) or themed Mermaid |
+| Dense pairwise relations | Matrix heatmap (`.ux-matrix`) — beats a hairball graph |
+| Code change / PR | Annotated diff + verdict (`.ux-diff` + `.ux-verdict`) + blast radius |
+| Concept / misconception | Naive-vs-correct panels (`.ux-compare`) + one worked example |
+| Comparison / audit / matrix | Sortable, filterable table (`.ux-table`, `th[data-sort]`, `data-ux-filter`) |
+| Quantitative metrics | Delta-led KPI row (`.ux-kpis`) + leanest honest chart (`.ux-bars`/`.ux-linechart`) |
+| Plan / roadmap | Current→target block + risk-tiered timeline (`.ux-timeline`) |
+| Presentation | Slide deck (`templates/slides`) |
+| Nothing fits | Custom inline SVG using theme tokens |
 
-## Reference routing
+## Templates (`templates/`, with sources in `templates/_src/`)
 
-Read only what the current output needs:
+| Template | Language | Demonstrates |
+|---|---|---|
+| `chameleon.<preset>.html` | all 7 | the SAME explanation rendered in every language — the squint test |
+| `blueprint` → `playground` | Blueprint | parameter-driven model (sliders, bound KPIs/bars, presets) |
+| `terminal-diff` | Terminal | PR review: annotated diff + verdict + blast radius |
+| `instrument-dashboard` | Instrument | KPI masthead + honest line/bar charts + sortable/filter table |
+| `editorial-concept` | Editorial | concept explainer: scroll-spy nav + custom SVG + naive-vs-correct + sidenotes |
+| `notebook-teach` | Notebook | TEACH mode: step-through + predict-then-reveal + transfer check |
+| `swiss-comparison` | Swiss | decision matrix: oversized numerals + sortable comparison table |
+| `luminous-flow` | Luminous | scenario toggle (hit/miss) + routed graph + optional glow |
+| `mermaid` | any | themed Mermaid with zoom / pan / expand |
+| `slides` | any | full-viewport deck with keyboard/scroll nav |
+
+## Reference routing — read only what the current output needs
 
 | Need | Read |
 |---|---|
-| Tokens, themes, glow/flat toggle, motion, a11y | `references/design-system.md` |
-| Component markup (graphs, diff, charts, tabs, timeline, custom SVG…) | `references/components.md` |
 | How to decide what/how to show (the brain) | `references/synthesis-method.md` |
-| Self-containment, overflow safety, delivery checklist | `references/self-contained.md` |
+| The 7 languages, selection scorecard, squint test | `references/aesthetic-languages.md` |
+| Token tiers, every `.ux-` component, build/assembly | `references/component-contract.md` |
+| Representation catalog + data-shape × job routing | `references/representations.md` |
+| Sliders, scenario toggles, steppers, graphs, scroll-spy — the JS API | `references/interactivity.md` |
+| Honest charts: numbers ledger, channel ranking, axis rules | `references/charts-honesty.md` |
+| TEACH mode: learner-state, concrete-first, predict-reveal, transfer | `references/teaching.md` |
+| Per-job playbooks (pr-review, postmortem, ADR, perf-profile, …) | `references/playbooks.md` |
+| Self-containment, overflow safety, verification loop, delivery checklist | `references/self-contained.md` |
 | Themed Mermaid (when + how) | `references/mermaid.md` |
 | Slide decks | `references/slides.md` |
 
 ## Invariants
 
-- **Glow is budgeted and optional.** It appears only on the active path, the single most important state/answer, and key metrics — routed through `--fx-*` variables so `data-fx="flat"` cleanly removes it. Build new glow through an `--fx-*` var, never hard-coded, so the toggle keeps working. No continuous breathing/pulsing on static content.
+- **Truth outranks beauty and craft.** Anchor or omit; hedge inferred/assumed content; never invent layers, symmetry, edges, or rationale. Interactive ranges/functions are anchored or stamped "illustrative model."
+- **One language per page, chosen on the merits and recorded.** It must pass the squint test. Glow is Luminous-only, routed through `--fx-*` so `data-fx="flat"` cleanly removes it; no continuous breathing/pulsing on static content.
 - **No horizontal page scroll.** `min-width:0` on grid/flex children; wide content (diffs, tables, Mermaid) scrolls inside its own `overflow-x:auto` container. Verify at 360px.
-- **Both themes and both fx modes must look composed.** Aurora Day is retuned, not inverted (lower glow alpha). Respect `prefers-reduced-motion` and `prefers-color-scheme`; keep keyboard focus visible.
-- **Evidence over polish.** Every node/edge/number traces to a real anchor; inferred/assumed content is visibly hedged; never invent layers, symmetry, or rationale. A clearly-marked "couldn't confirm X" beats a confident fabrication.
+- **Both themes look composed.** Light is retuned, not inverted. Respect `prefers-reduced-motion` and `prefers-color-scheme`; keep keyboard focus visible; print-safe.
+- **Components consume semantic + `--fx-*` tokens only — never hex.** New looks come from theme packs, not inline colors.
 - **Never define a page-level `.node` class** — Mermaid uses it internally. All UltraExplainer classes are `.ux-` prefixed.
+- **Observe before delivering.** Render the page, look at it, fix what's wrong. Don't assert what you didn't measure.
 
 ## Final checklist
 
-Before delivering: complete self-contained document written to the right path · no console errors · no horizontal overflow at desktop or 360px · fonts degrade gracefully · the thesis is obvious in the first viewport with exactly one focal point · tables/diffs/diagrams scroll inside their own containers · theme + glow toggles work · Mermaid (if any) uses the diagram shell with zoom/pan · every claim is anchored or hedged.
+Self-contained document at the right path · built with the chosen `preset` · no console errors · no horizontal overflow at desktop or 360px · fonts degrade gracefully · the thesis is obvious in the first viewport with exactly one focal point · tables/diffs/diagrams scroll inside their own containers · theme (and Luminous glow) toggles work · every claim anchored or hedged · the page was actually rendered and inspected.

@@ -1,0 +1,100 @@
+<!--ux: {"title":"Gateway p99 — last 24h — UltraExplainer","preset":"instrument","theme":"dark","head":"<style>.dash-2{display:grid;gap:24px}@media(min-width:820px){.dash-2{grid-template-columns:1.7fr 1fr;align-items:stretch}}.chart-pad{padding:20px 22px}.tbl-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:12px}.spike-lab{font-family:var(--font-mono);font-size:10px;fill:var(--bad)}</style>"} -->
+<div class="ux-wrap">
+
+  <header>
+    <span class="ux-kicker">Gateway · last 24h · <span class="ux-strong">sample data</span></span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">Gateway p99 <span class="lit">doubled at 14:00</span> — and one slow endpoint is dragging every percentile with it.</h1>
+    <p class="ux-lede ux-rise" style="--i:1">The fleet looks healthy on averages. The tail tells a different story: a 36&nbsp;req/s reporting endpoint at ~1&nbsp;s p99 is enough to move the whole gateway's 99th percentile.</p>
+  </header>
+
+  <section class="ux-section">
+    <div class="ux-kpis">
+      <div class="ux-panel ux-kpi ux-kpi--focus">
+        <div class="ux-kpi__val" style="color:var(--bad)">150<span style="font-size:.5em;color:var(--text-dim)">ms</span></div>
+        <div class="ux-kpi__label">Gateway p99</div>
+        <div class="ux-kpi__trend ux-kpi__trend--down">↑ 2.1× since 14:00</div>
+      </div>
+      <div class="ux-panel ux-kpi">
+        <div class="ux-kpi__val">188<span style="font-size:.5em;color:var(--text-dim)">k/min</span></div>
+        <div class="ux-kpi__label">Requests</div>
+        <div class="ux-kpi__trend">≈ flat vs 24h ago</div>
+      </div>
+      <div class="ux-panel ux-kpi">
+        <div class="ux-kpi__val">0.6<span style="font-size:.5em;color:var(--text-dim)">%</span></div>
+        <div class="ux-kpi__label">Error rate</div>
+        <div class="ux-kpi__trend ux-kpi__trend--up">↓ from 0.9%</div>
+      </div>
+      <div class="ux-panel ux-kpi ux-kpi--down">
+        <div class="ux-kpi__val">38<span style="font-size:.5em;color:var(--text-dim)">%</span></div>
+        <div class="ux-kpi__label">Error budget burned</div>
+        <div class="ux-kpi__trend ux-kpi__trend--down">↑ 12pt this week</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="dash-2">
+      <div class="ux-panel chart-pad">
+        <div class="ux-section-title" style="margin-bottom:14px">p99 read latency · ms · every 2h</div>
+        <svg class="ux-linechart" viewBox="0 0 720 210" role="img" aria-label="p99 latency over 24 hours, spiking from about 72ms to 150ms at 14:00">
+          <line class="grid" x1="20" y1="180" x2="710" y2="180"></line>
+          <line class="grid" x1="20" y1="140" x2="710" y2="140"></line>
+          <line class="grid" x1="20" y1="100" x2="710" y2="100"></line>
+          <line class="grid" x1="20" y1="60" x2="710" y2="60"></line>
+          <text class="axis" x="0" y="184">0</text>
+          <text class="axis" x="0" y="144">40</text>
+          <text class="axis" x="0" y="104">80</text>
+          <text class="axis" x="0" y="64">120</text>
+          <path class="area" d="M20,120 L82,122 L144,118 L205,115 L267,110 L329,108 L391,100 L453,30 L514,40 L576,85 L638,108 L700,116 L700,180 L20,180 Z"></path>
+          <path class="line" d="M20,120 L82,122 L144,118 L205,115 L267,110 L329,108 L391,100 L453,30 L514,40 L576,85 L638,108 L700,116"></path>
+          <line class="grid" x1="453" y1="20" x2="453" y2="180" stroke-dasharray="4 5" style="stroke:var(--bad);opacity:.55"></line>
+          <text class="spike-lab" x="458" y="28">14:00 deploy</text>
+          <circle class="dot--end" cx="700" cy="116" r="4"></circle>
+          <text class="axis" x="20" y="200">00:00</text>
+          <text class="axis" x="350" y="200">12:00</text>
+          <text class="axis" x="640" y="200">22:00</text>
+        </svg>
+      </div>
+
+      <div class="ux-panel chart-pad">
+        <div class="ux-section-title" style="margin-bottom:14px">Responses by class · %</div>
+        <div class="ux-bars" style="height:150px">
+          <div class="ux-bar"><div class="ux-bar__v">96</div><div class="ux-bar__col ux-bar__col--good is-focus" style="height:96%"></div><div class="ux-bar__x">2xx</div></div>
+          <div class="ux-bar"><div class="ux-bar__v">2.8</div><div class="ux-bar__col" style="height:6%"></div><div class="ux-bar__x">3xx</div></div>
+          <div class="ux-bar"><div class="ux-bar__v">0.6</div><div class="ux-bar__col" style="height:4%"></div><div class="ux-bar__x">4xx</div></div>
+          <div class="ux-bar"><div class="ux-bar__v">0.6</div><div class="ux-bar__col" style="height:4%"></div><div class="ux-bar__x">5xx</div></div>
+        </div>
+        <p class="ux-prose" style="font-size:13px;margin-top:14px;color:var(--text-dim)">Success rate is fine — the incident is <span class="ux-strong">latency</span>, not errors. A dashboard that only watched error rate would have missed it entirely.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="tbl-head">
+      <div class="ux-section-title">Endpoints by tail latency</div>
+      <input class="ux-input" data-ux-filter="#eptbl" data-ux-count="#epcount" placeholder="filter endpoints…" aria-label="Filter endpoints">
+      <span class="ux-label ux-label--meta"><span id="epcount">8 / 8</span> shown · click a column to sort</span>
+    </div>
+    <div class="ux-table-wrap"><div class="ux-table-scroll"><table class="ux-table" id="eptbl">
+      <thead><tr>
+        <th data-sort>Endpoint <span class="ux-sort-i"></span></th>
+        <th data-sort="num" class="num">req/s <span class="ux-sort-i"></span></th>
+        <th data-sort="num" class="num">p99 ms <span class="ux-sort-i"></span></th>
+        <th data-sort="num" class="num">err % <span class="ux-sort-i"></span></th>
+        <th>Status</th>
+      </tr></thead>
+      <tbody>
+        <tr class="is-flag"><td><code>GET /v1/reports</code></td><td class="num">36</td><td class="num">980</td><td class="num">2.1</td><td><span class="ux-badge ux-badge--bad">degraded</span></td></tr>
+        <tr class="is-warn"><td><code>POST /v1/webhooks</code></td><td class="num">150</td><td class="num">210</td><td class="num">1.2</td><td><span class="ux-badge ux-badge--warn">watch</span></td></tr>
+        <tr><td><code>POST /v1/charges</code></td><td class="num">410</td><td class="num">120</td><td class="num">0.4</td><td><span class="ux-badge ux-badge--good">healthy</span></td></tr>
+        <tr><td><code>GET /v1/invoices</code></td><td class="num">290</td><td class="num">88</td><td class="num">0.3</td><td><span class="ux-badge ux-badge--good">healthy</span></td></tr>
+        <tr><td><code>DELETE /v1/customers</code></td><td class="num">24</td><td class="num">75</td><td class="num">0.1</td><td><span class="ux-badge ux-badge--good">healthy</span></td></tr>
+        <tr><td><code>GET /v1/subscriptions</code></td><td class="num">520</td><td class="num">61</td><td class="num">0.2</td><td><span class="ux-badge ux-badge--good">healthy</span></td></tr>
+        <tr><td><code>GET /v1/customers</code></td><td class="num">880</td><td class="num">55</td><td class="num">0.2</td><td><span class="ux-badge ux-badge--good">healthy</span></td></tr>
+        <tr><td><code>GET /v1/charges</code></td><td class="num">1240</td><td class="num">42</td><td class="num">0.1</td><td><span class="ux-badge ux-badge--good">healthy</span></td></tr>
+      </tbody>
+    </table></div></div>
+    <p class="ux-prose" style="font-size:13px;margin-top:12px;color:var(--text-dim)">Sort by <span class="ux-strong">p99</span> and the story is unambiguous: <code>/v1/reports</code> is 8× slower than anything else at a fraction of the traffic. That's a query-plan or N+1 problem on one route, not a fleet-wide capacity issue — so the fix is scoped, not a scale-up.</p>
+  </section>
+
+</div>

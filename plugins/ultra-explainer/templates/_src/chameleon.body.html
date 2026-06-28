@@ -1,0 +1,64 @@
+<!--ux: {"title":"Cache layer — UltraExplainer","presets":["blueprint","terminal","luminous","editorial","instrument","notebook","swiss"],"head":"<style>.lay-cache{grid-template-columns:repeat(4,minmax(0,1fr));align-items:center}@media(max-width:820px){.lay-cache{grid-template-columns:1fr}}</style>"} -->
+<div class="ux-wrap">
+
+  <header>
+    <span class="ux-kicker">Cache · read path</span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">A read hits the cache <span class="lit">94% of the time</span> — the other 6% is what you tune.</h1>
+    <p class="ux-lede ux-rise" style="--i:1">The same explanation, rendered in three different design languages. Same components, same data — UltraExplainer picks the language to fit the subject and audience, instead of forcing one house style.</p>
+  </header>
+
+  <section class="ux-section">
+    <div class="ux-kpis">
+      <div class="ux-panel ux-kpi ux-kpi--focus"><div class="ux-kpi__val">94%</div><div class="ux-kpi__label">Hit rate</div><div class="ux-kpi__trend ux-kpi__trend--up">↑ from 81%</div></div>
+      <div class="ux-panel ux-kpi"><div class="ux-kpi__val">8ms</div><div class="ux-kpi__label">p99 read</div><div class="ux-kpi__trend">≈ flat</div></div>
+      <div class="ux-panel ux-kpi"><div class="ux-kpi__val">120/m</div><div class="ux-kpi__label">Evictions</div><div class="ux-kpi__trend ux-kpi__trend--down">↓ from 540/m</div></div>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-section-title">Read path</div>
+    <div class="ux-graph">
+      <svg class="ux-graph__edges" aria-hidden="true"></svg>
+      <div class="ux-graph__layer lay-cache">
+        <div class="ux-node" data-accent="accent" id="c-req"><div class="ux-node__label">in</div><div class="ux-node__title">Request</div></div>
+        <div class="ux-node" data-accent="accent2" id="c-cache"><div class="ux-node__label">layer</div><div class="ux-node__title">Cache</div><div class="ux-node__desc">LRU, 2GB</div></div>
+        <div class="ux-node" id="c-db"><div class="ux-node__label">miss 6%</div><div class="ux-node__title">Database</div></div>
+        <div class="ux-node" data-accent="good" id="c-resp"><div class="ux-node__label">out</div><div class="ux-node__title">Response</div></div>
+      </div>
+      <script type="application/json" class="ux-edges">
+        [{"from":"c-req","to":"c-cache","color":"accent"},
+         {"from":"c-cache","to":"c-resp","color":"good"},
+         {"from":"c-cache","to":"c-db","color":"edge","dashed":true},
+         {"from":"c-db","to":"c-resp","color":"accent2"}]
+      </script>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-grid ux-cols-2" style="align-items:start">
+      <div>
+        <div class="ux-section-title">The fix</div>
+        <div class="ux-diff">
+          <div class="ux-diff__bar"><span class="ux-diff__branch">⎇</span><span class="ux-diff__file">cache.ts</span><span class="ux-diff__tally"><span class="add">+2</span><span class="del">−1</span></span></div>
+          <div class="ux-diff__scroll">
+            <div class="ux-diff__row"><div class="ux-diff__ln">41</div><div class="ux-diff__gut"></div><div class="ux-diff__code"><span class="tok-k">const</span> ttl = <span class="tok-n">60</span>;</div></div>
+            <div class="ux-diff__row ux-diff__row--del"><div class="ux-diff__ln"></div><div class="ux-diff__gut"></div><div class="ux-diff__code">cache.set(key, val);</div></div>
+            <div class="ux-diff__row ux-diff__row--add"><div class="ux-diff__ln">42</div><div class="ux-diff__gut"></div><div class="ux-diff__code">cache.set(key, val, { ttl, <span class="tok-f">staleWhileRevalidate</span>: <span class="tok-k">true</span> });</div></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="ux-section-title">By key prefix</div>
+        <div class="ux-table-wrap"><div class="ux-table-scroll"><table class="ux-table">
+          <thead><tr><th>Prefix</th><th class="num">Hit</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td><code>user:</code></td><td class="num">97%</td><td><span class="ux-badge ux-badge--good">healthy</span></td></tr>
+            <tr><td><code>feed:</code></td><td class="num">88%</td><td><span class="ux-badge ux-badge--warn">churny</span></td></tr>
+            <tr><td><code>search:</code></td><td class="num">62%</td><td><span class="ux-badge ux-badge--bad">thrashing</span></td></tr>
+          </tbody>
+        </table></div></div>
+      </div>
+    </div>
+  </section>
+
+</div>

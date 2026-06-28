@@ -1,0 +1,365 @@
+/* ==========================================================================
+   ULTRAEXPLAINER · themes.css — the chameleon studio.
+   Each [data-theme-preset="X"] block fills the semantic tokens core.css
+   consumes (a primary tuning + a light/dark counter-tuning) and adds its
+   own layout-grammar + signature overrides. The SAME components re-skin
+   per preset. data-theme="light|dark" picks the tuning; the head resolver
+   sets both before paint. Glow lives ONLY in Luminous (via the --fx-* layer).
+   ========================================================================== */
+
+/* ============================================================ BLUEPRINT
+   Cyanotype ink-on-graph. Studying structure: architecture, schemas, infra. */
+[data-theme-preset="blueprint"] {
+  --font-display: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  --bg: #e9eff6; --bg-2: #dde6f1;
+  --surface: #fbfdff; --surface-2: #eef4fb; --surface-3: #ffffff; --recessed: #e4ecf6;
+  --hairline: rgba(27,72,128,0.18); --hairline-strong: rgba(27,72,128,0.34);
+  --text: #16314f; --text-dim: #3f5a78; --text-faint: #7d92ad;
+  --accent: #1b6ec2; --accent-2: #0e7c86; --accent-3: #5b6b9e;
+  --accent-soft: rgba(27,110,194,0.10); --accent-2-soft: rgba(14,124,134,0.10);
+  --good: #2f8f4e; --warn: #b9740f; --bad: #c0392b; --meta: #5b6b9e;
+  --good-soft: rgba(47,143,78,0.10); --warn-soft: rgba(185,116,15,0.10); --bad-soft: rgba(192,57,43,0.09);
+  --edge: rgba(27,72,128,0.40);
+  --shadow: 0 1px 0 rgba(27,72,128,0.06); --shadow-strong: 0 14px 36px -22px rgba(27,72,128,0.34); --inset: none;
+  --radius: 4px; --radius-sm: 3px; --radius-lg: 6px;
+  --grain: linear-gradient(rgba(27,110,194,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(27,110,194,0.05) 1px, transparent 1px);
+  --code-bg: #0e2138; --code-text: #d6e4f5;
+  --focal-border: var(--accent); --focal-ring: 0 0 0 2px var(--accent-soft);
+}
+[data-theme-preset="blueprint"] body { background-size: 22px 22px; }
+[data-theme-preset="blueprint"] .ux-panel { border-width: 1px; }
+/* cornered-frame signature on focal panels */
+[data-theme-preset="blueprint"] .ux-panel--focal::before, [data-theme-preset="blueprint"] .ux-panel--focal::after { content: ""; position: absolute; width: 12px; height: 12px; border: 2px solid var(--accent); }
+[data-theme-preset="blueprint"] .ux-panel--focal::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+[data-theme-preset="blueprint"] .ux-panel--focal::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+[data-theme-preset="blueprint"] .ux-kicker, [data-theme-preset="blueprint"] .ux-section-title { letter-spacing: 0.22em; }
+[data-theme-preset="blueprint"][data-theme="dark"] {
+  --bg: #0a1626; --bg-2: #0d1b2e; --surface: #0f2138; --surface-2: #122844; --surface-3: #15304f; --recessed: #0b1c30;
+  --hairline: rgba(120,170,230,0.16); --hairline-strong: rgba(120,170,230,0.30);
+  --text: #d4e4f7; --text-dim: #93aece; --text-faint: #5f7a9c; --accent: #4aa3e8; --accent-2: #36c3c9; --edge: rgba(120,170,230,0.34);
+  --grain: linear-gradient(rgba(74,163,232,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(74,163,232,0.06) 1px, transparent 1px);
+  --shadow: 0 1px 0 rgba(0,0,0,0.3);
+}
+
+/* ============================================================ TERMINAL / IDE
+   Developer-native: editor chrome, gutters, syntax-token accents. Diffs, CI, logs. */
+[data-theme-preset="terminal"] {
+  --font-display: "Inter Tight", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter Tight", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+  --bg: #0c1018; --bg-2: #0a0e15;
+  --surface: #121826; --surface-2: #161d2d; --surface-3: #1b2436; --recessed: #0a0e16;
+  --hairline: rgba(150,170,210,0.12); --hairline-strong: rgba(150,170,210,0.22);
+  --text: #cdd6e6; --text-dim: #8a96ab; --text-faint: #5a6478;
+  --accent: #67c0ff; --accent-2: #6ee7a8; --accent-3: #c084fc;
+  --accent-soft: rgba(103,192,255,0.12); --accent-2-soft: rgba(110,231,168,0.12);
+  --good: #6ee7a8; --warn: #f0c879; --bad: #ff7a85; --meta: #c084fc;
+  --good-soft: rgba(110,231,168,0.10); --warn-soft: rgba(240,200,121,0.10); --bad-soft: rgba(255,122,133,0.10);
+  --edge: rgba(150,170,210,0.32);
+  --code-bg: #0a0e16; --code-text: #cdd6e6;
+  --tok-key: #c084fc; --tok-str: #6ee7a8; --tok-com: #5a6478; --tok-fn: #67c0ff; --tok-num: #f0a868;
+  --shadow: 0 12px 30px -20px rgba(0,0,0,0.7); --inset: none;
+  --radius: 6px; --radius-sm: 5px;
+  --grain: radial-gradient(rgba(150,170,210,0.05) 1px, transparent 1px);
+  --focal-border: var(--accent-2); --focal-ring: 0 0 0 1px color-mix(in srgb, var(--accent-2) 30%, transparent);
+}
+[data-theme-preset="terminal"] body { background-size: 16px 16px; }
+[data-theme-preset="terminal"] .ux-kicker { color: var(--accent-2); }
+[data-theme-preset="terminal"][data-theme="light"] {
+  --bg: #fdf6e3; --bg-2: #f4ecd8; --surface: #fffdf5; --surface-2: #f1ead4; --surface-3: #fffdf5; --recessed: #efe7d0;
+  --hairline: rgba(88,110,117,0.18); --hairline-strong: rgba(88,110,117,0.32);
+  --text: #45525a; --text-dim: #657b83; --text-faint: #93a1a1; --accent: #268bd2; --accent-2: #2aa198; --accent-3: #6c71c4;
+  --good: #859900; --warn: #b58900; --bad: #dc322f; --meta: #6c71c4; --code-bg: #073642; --code-text: #eee8d5; --edge: rgba(88,110,117,0.34);
+}
+
+/* ============================================================ LUMINOUS (ex-Aurora)
+   Glass + budgeted glow + particle field. ONE option, never default. System-flow demos. */
+[data-theme-preset="luminous"] {
+  --font-display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter Tight", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+  --bg: #05070d; --bg-2: #070a12;
+  --surface: rgba(20,27,43,0.55); --surface-2: rgba(26,33,50,0.5); --surface-3: rgba(30,40,62,0.62); --recessed: rgba(8,12,22,0.72);
+  --hairline: rgba(150,180,230,0.10); --hairline-strong: rgba(150,185,235,0.22);
+  --text: #e7edfb; --text-dim: #93a0bf; --text-faint: #5d6b8a;
+  --accent: #38e0e6; --accent-2: #3b82f6; --accent-3: #a78bfa;
+  --accent-soft: rgba(56,224,230,0.12); --accent-2-soft: rgba(59,130,246,0.12);
+  --good: #2bd58a; --warn: #ffc555; --bad: #ff5d6c; --meta: #a78bfa;
+  --good-soft: rgba(43,213,138,0.12); --warn-soft: rgba(255,197,85,0.10); --bad-soft: rgba(255,93,108,0.10);
+  --edge: rgba(150,180,230,0.34); --code-bg: #0a0f1e; --code-text: #d6e0f5;
+  --shadow: 0 24px 60px -28px rgba(0,0,0,0.85); --inset: inset 0 1px 0 rgba(255,255,255,0.05);
+  --radius: 16px; --radius-sm: 10px; --radius-lg: 18px;
+  --grain: radial-gradient(60% 50% at 12% 100%, rgba(96,178,255,0.16) 0%, transparent 70%), radial-gradient(55% 50% at 92% 96%, rgba(92,242,173,0.13) 0%, transparent 70%), radial-gradient(70% 40% at 50% -10%, rgba(167,139,250,0.07) 0%, transparent 65%);
+  /* the ONLY theme that lights the FX layer */
+  --fx-accent-glow: 0 0 18px rgba(56,224,230,0.5); --fx-good-glow: 0 0 14px rgba(43,213,138,0.7);
+  --fx-focal-bloom: 0 0 40px -8px rgba(43,213,138,0.4); --fx-bar-glow: 0 0 18px -2px rgba(43,213,138,0.5);
+  --fx-node: 0 0 0 1px rgba(96,178,255,0.25), 0 0 24px -6px rgba(96,178,255,0.5); --fx-edge-glow: drop-shadow(0 0 4px currentColor);
+  --fx-text-accent: 0 0 26px rgba(43,213,138,0.45); --fx-field-opacity: 0.5;
+  --focal-border: var(--good); --focal-ring: 0 0 0 1px rgba(43,213,138,0.25);
+  --glass-blur: 16px;
+}
+[data-theme-preset="luminous"] .ux-panel, [data-theme-preset="luminous"] .ux-table-wrap, [data-theme-preset="luminous"] .ux-diagram-shell { backdrop-filter: blur(var(--glass-blur)) saturate(1.2); -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.2); }
+[data-theme-preset="luminous"][data-theme="light"] {
+  --bg: #eef2fb; --bg-2: #e6ecf8; --surface: rgba(255,255,255,0.72); --surface-2: rgba(248,250,255,0.78); --surface-3: rgba(255,255,255,0.88); --recessed: rgba(228,234,244,0.85);
+  --hairline: rgba(30,50,90,0.10); --hairline-strong: rgba(30,50,90,0.20); --text: #0e1729; --text-dim: #4a5775; --text-faint: #7585a8;
+  --accent: #0891b2; --accent-2: #2563eb; --good: #059669; --bad: #d23842; --meta: #7c3aed;
+  --grain: radial-gradient(60% 50% at 12% 100%, rgba(37,99,235,0.12) 0%, transparent 70%), radial-gradient(55% 50% at 92% 96%, rgba(5,150,105,0.10) 0%, transparent 70%);
+  --fx-accent-glow: 0 0 12px rgba(8,145,178,0.3); --fx-good-glow: 0 0 10px rgba(5,150,105,0.4); --fx-focal-bloom: 0 0 26px -8px rgba(5,150,105,0.3);
+  --fx-text-accent: 0 0 16px rgba(5,150,105,0.3); --fx-field-opacity: 0.3;
+}
+
+/* ============================================================ DATA INSTRUMENT
+   Bloomberg-terminal / lab-readout precision. Metrics, benchmarks, audits.
+   PRIMARY dark slate; gridline hairlines; tight radius; minimal shadow;
+   tabular mono; colorblind-safe categorical accents. Counter-tuning = crisp white panel. */
+[data-theme-preset="instrument"] {
+  --font-display: "Inter Tight", "Geist", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Inter Tight", "Geist", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+  --bg: #0d1117; --bg-2: #090d13;
+  --surface: #11161f; --surface-2: #161c27; --surface-3: #1b222f; --recessed: #0a0e15;
+  --hairline: rgba(139,164,201,0.20); --hairline-strong: rgba(139,164,201,0.36);
+  --text: #e6edf3; --text-dim: #97a3b6; --text-faint: #5e6b80;
+  --accent: #4c8dff; --accent-2: #2aa9b8; --accent-3: #b98cff;
+  --accent-soft: rgba(76,141,255,0.13); --accent-2-soft: rgba(42,169,184,0.13);
+  --good: #3fb950; --warn: #d29922; --bad: #f85149;
+  --good-soft: rgba(63,185,80,0.12); --warn-soft: rgba(210,153,34,0.12); --bad-soft: rgba(248,81,73,0.11);
+  --meta: #b98cff;
+  --edge: rgba(139,164,201,0.42);
+  --code-bg: #0a0e15; --code-text: #e6edf3;
+  --tok-key: #b98cff; --tok-str: #3fb950; --tok-com: #5e6b80; --tok-fn: #4c8dff; --tok-num: #d29922;
+  --shadow: 0 1px 0 rgba(0,0,0,0.4); --shadow-strong: 0 10px 28px -22px rgba(0,0,0,0.8); --inset: none;
+  --radius: 4px; --radius-sm: 3px; --radius-lg: 6px;
+  --grain: repeating-linear-gradient(0deg, rgba(139,164,201,0.035) 0px, rgba(139,164,201,0.035) 1px, transparent 1px, transparent 26px);
+  --focal-border: var(--accent); --focal-ring: 0 0 0 1px var(--accent-soft);
+}
+[data-theme-preset="instrument"] body { background-attachment: scroll; }
+/* KPI masthead: hairline separators, oversized tabular numerals, dense readout feel */
+[data-theme-preset="instrument"] .ux-kpis { gap: 1px; background: var(--hairline); border: 1px solid var(--hairline); border-radius: var(--radius); overflow: hidden; }
+[data-theme-preset="instrument"] .ux-kpi { border: none; border-radius: 0; box-shadow: none; background: var(--surface); }
+[data-theme-preset="instrument"] .ux-kpi__val { letter-spacing: -2px; font-variant-numeric: tabular-nums; }
+[data-theme-preset="instrument"] .ux-kpi__label { letter-spacing: 0.18em; color: var(--text-faint); }
+[data-theme-preset="instrument"] .ux-kpi--focus::before { background: var(--accent); box-shadow: none; }
+/* Technical, very tight section titles; full-width gridline rule */
+[data-theme-preset="instrument"] .ux-section-title { letter-spacing: 0.24em; font-size: 10px; color: var(--text-faint); }
+[data-theme-preset="instrument"] .ux-section-title::after { background: var(--hairline-strong); }
+[data-theme-preset="instrument"] .ux-kicker { letter-spacing: 0.2em; }
+/* Dense table: tighter cells, tabular everything, gridline column dividers */
+[data-theme-preset="instrument"] .ux-table { font-size: 12.5px; }
+[data-theme-preset="instrument"] .ux-table th { padding: 9px 14px; letter-spacing: 0.14em; font-size: 10px; }
+[data-theme-preset="instrument"] .ux-table td { padding: 8px 14px; font-variant-numeric: tabular-nums; }
+[data-theme-preset="instrument"] .ux-table tbody tr:hover { background: var(--surface-3); }
+/* Panels read as instrument bezels: square, hairline, flat */
+[data-theme-preset="instrument"] .ux-panel { box-shadow: none; }
+[data-theme-preset="instrument"] .ux-thesis { letter-spacing: -1.6px; }
+/* Counter-tuning: crisp white instrument panel */
+[data-theme-preset="instrument"][data-theme="light"] {
+  --bg: #f4f6f9; --bg-2: #eaeef3;
+  --surface: #ffffff; --surface-2: #f6f8fb; --surface-3: #ffffff; --recessed: #eef2f6;
+  --hairline: rgba(40,62,98,0.18); --hairline-strong: rgba(40,62,98,0.34);
+  --text: #0d1117; --text-dim: #4a5568; --text-faint: #8593a6;
+  --accent: #2f6fe0; --accent-2: #0e8a98; --accent-3: #7c52d6;
+  --accent-soft: rgba(47,111,224,0.10); --accent-2-soft: rgba(14,138,152,0.10);
+  --good: #1a7f37; --warn: #9a6700; --bad: #cf222e;
+  --good-soft: rgba(26,127,55,0.10); --warn-soft: rgba(154,103,0,0.10); --bad-soft: rgba(207,34,46,0.09);
+  --meta: #7c52d6; --edge: rgba(40,62,98,0.42);
+  --code-bg: #0d1117; --code-text: #e6edf3;
+  --grain: repeating-linear-gradient(0deg, rgba(40,62,98,0.04) 0px, rgba(40,62,98,0.04) 1px, transparent 1px, transparent 26px);
+  --shadow: 0 1px 0 rgba(40,62,98,0.06);
+}
+
+/* ============================================================ EDITORIAL PRINT
+   Magazine / whitepaper. Warm paper ground, ink-black text, one oxblood accent
+   + a thin gold rule. Serif display & body for top-to-bottom stakeholder reading.
+   Near-square corners, hairline rules instead of shadows, no inset, no FX glow. */
+[data-theme-preset="editorial"] {
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-body: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Consolas, monospace;
+  --bg: #f6f1e7; --bg-2: #efe8da;
+  --surface: #fbf7ee; --surface-2: #f1ebdd; --surface-3: #fffdf8; --recessed: #ece4d3;
+  --hairline: rgba(40,32,24,0.16); --hairline-strong: rgba(40,32,24,0.34);
+  --text: #1f1a14; --text-dim: #5a4f42; --text-faint: #968a78;
+  --accent: #8a2b2b; --accent-2: #2a4a7a; --accent-3: #b08d2e;
+  --accent-soft: rgba(138,43,43,0.09); --accent-2-soft: rgba(42,74,122,0.09);
+  --good: #3f7a4d; --warn: #9a6a1a; --bad: #a83232;
+  --good-soft: rgba(63,122,77,0.10); --warn-soft: rgba(154,106,26,0.10); --bad-soft: rgba(168,50,50,0.09);
+  --meta: #b08d2e;
+  --edge: rgba(40,32,24,0.40);
+  --code-bg: #25201a; --code-text: #ede4d3;
+  --tok-key: #c98a8a; --tok-str: #9bb88a; --tok-com: #8a7d68; --tok-fn: #9ab0d0; --tok-num: #d0a861;
+  --shadow: 0 1px 0 rgba(40,32,24,0.05); --shadow-strong: 0 2px 0 rgba(40,32,24,0.08); --inset: none;
+  --radius: 3px; --radius-sm: 2px; --radius-lg: 4px;
+  --grain: linear-gradient(rgba(176,141,46,0.012), rgba(176,141,46,0.012));
+  --focal-border: var(--accent); --focal-ring: 0 0 0 1px var(--accent-soft);
+}
+/* signature: large serif thesis with tight leading, oxblood drop accent */
+[data-theme-preset="editorial"] .ux-thesis { font-weight: 540; font-size: clamp(34px, 5.4vw, 64px); letter-spacing: -0.4px; line-height: 0.98; max-width: 18ch; }
+[data-theme-preset="editorial"] .ux-thesis .lit { color: var(--accent); font-style: italic; }
+[data-theme-preset="editorial"] .ux-lede { font-style: italic; font-size: clamp(17px, 2.3vw, 21px); color: var(--text-dim); }
+/* signature: section title as a small-caps gold-underlined label */
+[data-theme-preset="editorial"] .ux-section-title { font-family: var(--font-body); font-variant: small-caps; text-transform: none; font-size: 14px; font-weight: 600; letter-spacing: 0.16em; color: var(--accent); border-bottom: 2px solid var(--accent-3); padding-bottom: 7px; display: block; }
+[data-theme-preset="editorial"] .ux-section-title::after { display: none; }
+[data-theme-preset="editorial"] .ux-kicker { font-family: var(--font-body); font-variant: small-caps; text-transform: none; letter-spacing: 0.14em; color: var(--accent); }
+/* signature: panel as a bordered note — generous padding, gold top rule, no shadow */
+[data-theme-preset="editorial"] .ux-panel { box-shadow: none; border-color: var(--hairline-strong); border-top: 3px solid var(--accent-3); padding: clamp(24px, 3.4vw, 40px); }
+[data-theme-preset="editorial"] .ux-panel--focal { border-top-color: var(--accent); }
+/* pull-quote feel on callouts: serif, no soft fill, oxblood bar + gold rule */
+[data-theme-preset="editorial"] .ux-callout { font-family: var(--font-body); font-style: italic; font-size: 17px; background: none; border: none; border-top: 1px solid var(--accent-3); border-bottom: 1px solid var(--accent-3); border-left: 3px solid var(--accent); border-radius: 0; padding: 18px 24px; }
+/* KPIs: serif numerals, hairline-ruled, no shadow */
+[data-theme-preset="editorial"] .ux-kpi { box-shadow: none; background: transparent; border: none; border-top: 1px solid var(--hairline-strong); border-radius: 0; padding: 18px 4px; }
+[data-theme-preset="editorial"] .ux-kpi__val { font-style: normal; letter-spacing: -1px; }
+[data-theme-preset="editorial"] .ux-table-wrap, [data-theme-preset="editorial"] .ux-diff, [data-theme-preset="editorial"] .ux-diagram-shell { box-shadow: none; }
+
+/* counter-tuning: refined dark "ink" mode — charcoal ground, cream text */
+[data-theme-preset="editorial"][data-theme="dark"] {
+  --bg: #1a1814; --bg-2: #16140f; --surface: #221f19; --surface-2: #1d1a14; --surface-3: #28241d; --recessed: #141209;
+  --hairline: rgba(220,205,178,0.16); --hairline-strong: rgba(220,205,178,0.30);
+  --text: #ece3d2; --text-dim: #b3a88f; --text-faint: #7c715c;
+  --accent: #d98a8a; --accent-2: #8aa6cc; --accent-3: #c9a651;
+  --accent-soft: rgba(217,138,138,0.12); --accent-2-soft: rgba(138,166,204,0.12);
+  --good: #82b58c; --warn: #d0a861; --bad: #d98a8a; --meta: #c9a651;
+  --good-soft: rgba(130,181,140,0.12); --warn-soft: rgba(208,168,97,0.10); --bad-soft: rgba(217,138,138,0.10);
+  --edge: rgba(220,205,178,0.36); --code-bg: #100e0a; --code-text: #ece3d2;
+  --shadow: 0 1px 0 rgba(0,0,0,0.4);
+}
+/* ============================================================ NOTEBOOK
+   Warm paper / Tufte field-notebook. Teaching, walkthroughs, onboarding.
+   Cream ground, ink text, ink-blue + oxblood accents, margin-note callouts. */
+[data-theme-preset="notebook"] {
+  --font-display: "Karla", "Literata", Georgia, serif;
+  --font-body: "Literata", Georgia, "Times New Roman", serif;
+  --font-mono: "Source Code Pro", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --bg: #f4efe4; --bg-2: #ece5d6;
+  --surface: #fbf8f0; --surface-2: #f1ebdd; --surface-3: #fdfbf5; --recessed: #ece4d3;
+  --hairline: rgba(42,38,32,0.16); --hairline-strong: rgba(42,38,32,0.30);
+  --text: #2a2620; --text-dim: #5c554a; --text-faint: #948b7a;
+  --accent: #2f5d8a; --accent-2: #8a3b2b; --accent-3: #6b5b3e;
+  --accent-soft: rgba(47,93,138,0.10); --accent-2-soft: rgba(138,59,43,0.10);
+  --good: #4a7a3a; --warn: #b07814; --bad: #a8392b; --meta: #6b5b3e;
+  --good-soft: rgba(74,122,58,0.12); --warn-soft: rgba(176,120,20,0.12); --bad-soft: rgba(168,57,43,0.10);
+  --edge: rgba(42,38,32,0.34);
+  --code-bg: #2c2820; --code-text: #ece4d3;
+  --tok-key: #c98a4b; --tok-str: #8fae6e; --tok-com: #8a8270; --tok-fn: #6fa3c4; --tok-num: #d09a6a;
+  --shadow: 0 6px 18px -12px rgba(60,48,28,0.30); --shadow-strong: 0 18px 44px -24px rgba(60,48,28,0.42);
+  --inset: inset 0 1px 0 rgba(255,255,255,0.45);
+  --radius: 8px; --radius-sm: 6px; --radius-lg: 12px;
+  /* faint warm speckle + manila tint — a static paper grain, no glow */
+  --grain: radial-gradient(rgba(120,100,70,0.05) 0.6px, transparent 0.7px), radial-gradient(rgba(90,75,50,0.04) 0.5px, transparent 0.6px), linear-gradient(180deg, rgba(244,239,228,0.0), rgba(232,222,202,0.35));
+  --focal-border: var(--accent); --focal-ring: 0 0 0 2px var(--accent-soft);
+}
+[data-theme-preset="notebook"] body { background-size: 7px 7px, 13px 11px, 100% 100%; }
+
+/* warm, approachable thesis: serif, restrained scale, ink colour for emphasis */
+[data-theme-preset="notebook"] .ux-thesis { font-family: var(--font-body); font-weight: 600; font-size: clamp(26px, 3.4vw, 40px); letter-spacing: -0.4px; line-height: 1.16; max-width: 24ch; }
+[data-theme-preset="notebook"] .ux-thesis .lit { color: var(--accent-2); }
+[data-theme-preset="notebook"] .ux-thesis .lit--grad { background: none; -webkit-background-clip: border-box; background-clip: border-box; color: var(--accent); }
+[data-theme-preset="notebook"] .ux-h2, [data-theme-preset="notebook"] .ux-h3 { font-family: var(--font-display); letter-spacing: -0.2px; }
+
+/* hand-labeled section title: ink underline rule, normal-case humanist mono */
+[data-theme-preset="notebook"] .ux-section-title { font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: none; color: var(--accent-2); }
+[data-theme-preset="notebook"] .ux-section-title::after { height: 1px; background: repeating-linear-gradient(90deg, var(--hairline-strong) 0 6px, transparent 6px 10px); }
+[data-theme-preset="notebook"] .ux-kicker { text-transform: none; letter-spacing: 0.04em; font-style: italic; }
+
+/* callout reads like a margin note: dog-eared, warm paper, hanging accent rule */
+[data-theme-preset="notebook"] .ux-callout { background: var(--surface-3); border: 1px solid var(--hairline); border-left: 3px solid var(--accent); border-radius: var(--radius-sm); font-family: var(--font-body); font-style: italic; box-shadow: var(--shadow); }
+[data-theme-preset="notebook"] .ux-callout--warn { border-left-color: var(--warn); background: var(--surface-3); }
+[data-theme-preset="notebook"] .ux-callout--good { border-left-color: var(--good); background: var(--surface-3); }
+
+/* sidenotes look like true margin annotations: ink-blue, ragged hairline tie-in */
+[data-theme-preset="notebook"] .ux-sidenote { font-family: var(--font-body); font-style: italic; color: var(--accent); border-left: 1px solid var(--hairline-strong); }
+
+/* gentle paper-card panel with a soft top inset highlight */
+[data-theme-preset="notebook"] .ux-panel { box-shadow: var(--shadow), var(--inset); }
+
+/* counter-tuning: cozy warm-charcoal dark */
+[data-theme-preset="notebook"][data-theme="dark"] {
+  --bg: #211d18; --bg-2: #1b1813; --surface: #2a2620; --surface-2: #312c24; --surface-3: #353029; --recessed: #1a1712;
+  --hairline: rgba(225,210,180,0.13); --hairline-strong: rgba(225,210,180,0.26);
+  --text: #ece2cf; --text-dim: #b3a78f; --text-faint: #7c7361;
+  --accent: #7eb0d6; --accent-2: #d98a72; --accent-3: #c7b083;
+  --accent-soft: rgba(126,176,214,0.13); --accent-2-soft: rgba(217,138,114,0.13);
+  --good: #8fb573; --warn: #e0b15c; --bad: #e08a78; --meta: #c7b083;
+  --good-soft: rgba(143,181,115,0.14); --warn-soft: rgba(224,177,92,0.13); --bad-soft: rgba(224,138,120,0.12);
+  --edge: rgba(225,210,180,0.30); --code-bg: #1a1712; --code-text: #ece2cf;
+  --grain: radial-gradient(rgba(225,210,180,0.04) 0.6px, transparent 0.7px), radial-gradient(rgba(225,210,180,0.03) 0.5px, transparent 0.6px), linear-gradient(180deg, rgba(33,29,24,0.0), rgba(27,24,19,0.5));
+  --shadow: 0 8px 22px -14px rgba(0,0,0,0.6);
+}
+/* ============================================================ SWISS
+   High-contrast International Typographic Style. Pure white, near-black ink,
+   ONE signal-red accent. Zero decoration: no shadow, no grain, hard corners.
+   Visible structure via THICK rules. Comparisons, principles, status. */
+[data-theme-preset="swiss"] {
+  --font-display: "DM Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-body: "DM Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+  --font-mono: "Fira Code", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --bg: #ffffff; --bg-2: #fafafa;
+  --surface: #ffffff; --surface-2: #fafafa; --surface-3: #ffffff; --recessed: #f2f2f2;
+  --hairline: rgba(10,10,10,0.16); --hairline-strong: rgba(10,10,10,0.9);
+  --text: #0a0a0a; --text-dim: #3a3a3a; --text-faint: #7a7a7a;
+  --accent: #e8000d; --accent-2: #0a0a0a; --accent-3: #e8000d;
+  --accent-soft: rgba(232,0,13,0.08); --accent-2-soft: rgba(10,10,10,0.06);
+  --good: #0a7d36; --warn: #b35900; --bad: #e8000d;
+  --good-soft: rgba(10,125,54,0.08); --warn-soft: rgba(179,89,0,0.09); --bad-soft: rgba(232,0,13,0.07);
+  --meta: #0a0a0a;
+  --edge: rgba(10,10,10,0.85);
+  --code-bg: #0a0a0a; --code-text: #f2f2f2;
+  --tok-key: #ff5d6c; --tok-str: #7ddf9a; --tok-com: #8a8a8a; --tok-fn: #7ab8ff; --tok-num: #f0a868;
+  --shadow: none; --shadow-strong: none; --inset: none;
+  --radius: 0px; --radius-sm: 0px; --radius-lg: 0px;
+  --grain: none;
+  --focal-border: var(--accent); --focal-ring: 0 0 0 2px var(--accent);
+}
+/* SIGNATURE: thick rule-divided section labels */
+[data-theme-preset="swiss"] .ux-section-title {
+  font-family: var(--font-display); font-weight: 700; font-size: 13px;
+  letter-spacing: 0.04em; color: var(--text);
+  border-top: 3px solid var(--hairline-strong); padding-top: 8px; gap: 14px;
+}
+[data-theme-preset="swiss"] .ux-section-title::after { display: none; }
+/* SIGNATURE: oversized bold thesis, very tight tracking */
+[data-theme-preset="swiss"] .ux-thesis {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(36px, 6vw, 76px); letter-spacing: -2.4px; line-height: 0.96;
+  max-width: 16ch; text-transform: none;
+}
+[data-theme-preset="swiss"] .ux-thesis .lit { color: var(--accent); }
+[data-theme-preset="swiss"] .ux-thesis .lit--grad {
+  background: none; -webkit-text-fill-color: var(--accent); color: var(--accent);
+}
+/* SIGNATURE: hard-edged panels with thick solid border, no shadow */
+[data-theme-preset="swiss"] .ux-panel {
+  border: 1.5px solid var(--hairline-strong); box-shadow: none;
+}
+[data-theme-preset="swiss"] .ux-panel--focal {
+  border: 2px solid var(--accent); box-shadow: none;
+}
+/* SIGNATURE: oversized KPI numerals */
+[data-theme-preset="swiss"] .ux-kpi {
+  border: 1.5px solid var(--hairline-strong); box-shadow: none;
+}
+[data-theme-preset="swiss"] .ux-kpi__val {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(40px, 6.5vw, 72px); letter-spacing: -3px;
+}
+[data-theme-preset="swiss"] .ux-kicker {
+  font-family: var(--font-display); font-weight: 700; letter-spacing: 0.04em;
+}
+[data-theme-preset="swiss"] .ux-h2 { font-weight: 700; letter-spacing: -0.8px; }
+
+/* counter-tuning: pure near-black, white ink, same single accent */
+[data-theme-preset="swiss"][data-theme="dark"] {
+  --bg: #0a0a0a; --bg-2: #050505;
+  --surface: #0a0a0a; --surface-2: #121212; --surface-3: #0a0a0a; --recessed: #161616;
+  --hairline: rgba(255,255,255,0.18); --hairline-strong: rgba(255,255,255,0.92);
+  --text: #fafafa; --text-dim: #c2c2c2; --text-faint: #8a8a8a;
+  --accent: #ff2a36; --accent-2: #fafafa; --accent-3: #ff2a36;
+  --accent-soft: rgba(255,42,54,0.12); --accent-2-soft: rgba(255,255,255,0.06);
+  --good: #3ad17a; --warn: #f0a040; --bad: #ff2a36;
+  --good-soft: rgba(58,209,122,0.12); --warn-soft: rgba(240,160,64,0.12); --bad-soft: rgba(255,42,54,0.12);
+  --meta: #fafafa; --edge: rgba(255,255,255,0.85);
+  --code-bg: #050505; --code-text: #f2f2f2;
+  --focal-border: var(--accent); --focal-ring: 0 0 0 2px var(--accent);
+}

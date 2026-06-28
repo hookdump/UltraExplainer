@@ -1,0 +1,62 @@
+<!--ux: {"title":"The fast path, and the fall-through — UltraExplainer","preset":"luminous","theme":"dark","head":"<style>.lay-flow{grid-template-columns:repeat(4,minmax(0,1fr));grid-template-areas:'req edge cache resp' '. . db .';row-gap:54px;align-items:center}.fa-req{grid-area:req}.fa-edge{grid-area:edge}.fa-cache{grid-area:cache}.fa-resp{grid-area:resp}.fa-db{grid-area:db}@media(max-width:760px){.lay-flow{grid-template-columns:1fr;grid-template-areas:'req' 'edge' 'cache' 'db' 'resp';row-gap:30px}}#flowroot .ux-epath,#flowroot .ux-node{transition:opacity .35s var(--ease)}#flowroot[data-scenario='hit'] .e-miss{opacity:.10}#flowroot[data-scenario='hit'] #n-db{opacity:.32}#flowroot[data-scenario='miss'] .e-hit{opacity:.12}.s-hit,.s-miss{display:none}#flowroot[data-scenario='hit'] .s-hit{display:block}#flowroot[data-scenario='miss'] .s-miss{display:block}.flow-cap{margin-top:30px}</style>"} -->
+<div class="ux-wrap">
+
+  <header>
+    <span class="ux-kicker">Read path · cache</span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">A cached read <span class="lit lit--grad">never touches the database</span>. Flip it to a miss and watch the same request fall all the way through.</h1>
+    <p class="ux-lede ux-rise" style="--i:1">One diagram, two regimes. The toggle doesn't load a new picture — it re-lights the path the request actually takes.</p>
+  </header>
+
+  <section class="ux-section">
+    <div class="ux-toolbar" style="justify-content:center;margin-bottom:8px">
+      <div class="ux-seg" data-scenario-ctl data-target="#flowroot" role="group" aria-label="Cache scenario">
+        <button data-scenario="hit" aria-pressed="true">cache hit</button>
+        <button data-scenario="miss" aria-pressed="false">cache miss</button>
+      </div>
+    </div>
+
+    <div id="flowroot" data-scenario="hit" data-scenario-root>
+      <div class="ux-graph">
+        <svg class="ux-graph__edges" aria-hidden="true"></svg>
+        <div class="ux-graph__layer lay-flow">
+          <div class="ux-node fa-req" data-accent="accent" id="n-req"><div class="ux-node__label">in</div><div class="ux-node__title">Request</div></div>
+          <div class="ux-node fa-edge" id="n-edge"><div class="ux-node__label">pop</div><div class="ux-node__title">Edge</div><div class="ux-node__desc">nearest region</div></div>
+          <div class="ux-node fa-cache" data-accent="accent2" id="n-cache"><div class="ux-node__label">lookup</div><div class="ux-node__title">Cache</div><div class="ux-node__desc">Redis · LRU</div></div>
+          <div class="ux-node fa-resp" data-accent="good" id="n-resp"><div class="ux-node__label">out</div><div class="ux-node__title">Response</div></div>
+          <div class="ux-node fa-db" id="n-db"><div class="ux-node__label">origin</div><div class="ux-node__title">Database</div><div class="ux-node__desc">primary</div></div>
+        </div>
+        <script type="application/json" class="ux-edges">
+          [{"from":"n-req","to":"n-edge","color":"accent"},
+           {"from":"n-edge","to":"n-cache","color":"accent"},
+           {"from":"n-cache","to":"n-resp","color":"good","cls":"e-hit"},
+           {"from":"n-cache","to":"n-db","color":"accent2","dashed":true,"cls":"e-miss"},
+           {"from":"n-db","to":"n-resp","color":"accent2","cls":"e-miss"}]
+        </script>
+      </div>
+
+      <div class="flow-cap">
+        <div class="s-hit">
+          <div class="ux-panel ux-panel--focal">
+            <div class="ux-eyebrow">Cache hit · the common case</div>
+            <p class="ux-h3" style="margin:6px 0 0">Cache answers directly. <span class="lit">~4 ms</span>, zero database load.</p>
+            <p class="ux-prose" style="margin-top:8px">The request stops at the cache. The database never sees it — which is the entire point of putting a cache there. For a read-heavy service this is 90&ndash;99% of traffic.</p>
+          </div>
+        </div>
+        <div class="s-miss">
+          <div class="ux-panel ux-panel--focal">
+            <div class="ux-eyebrow">Cache miss · the tail</div>
+            <p class="ux-h3" style="margin:6px 0 0">Cache forwards to the origin, fills, then answers. <span class="lit">~92 ms</span> this time.</p>
+            <p class="ux-prose" style="margin-top:8px">The miss pays the full origin round-trip <em>and</em> writes the result back, so the next identical read is a hit. A cold cache is all misses — which is why warm-up traffic looks nothing like steady state.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-callout">
+      <strong>What the toggle is and isn't.</strong> Both paths exist in the diagram at all times — the control only changes which one is lit. Hover any node to isolate just its connections. Latencies here are illustrative; measure your own cache and origin before quoting them.
+    </div>
+  </section>
+
+</div>

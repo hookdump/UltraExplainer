@@ -1,0 +1,88 @@
+<!--ux: {"title":"How a Bloom filter says \"definitely not\" — UltraExplainer","preset":"notebook","theme":"light","head":"<style>.bf{display:flex;gap:5px;flex-wrap:wrap;margin:14px 0 4px}.bf[hidden]{display:none}.bf-cell{width:40px;height:48px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--hairline-strong);border-radius:7px;font-family:var(--font-mono);font-size:16px;font-weight:600;background:var(--surface);color:var(--text-faint);transition:transform .15s var(--ease),box-shadow .15s var(--ease)}.bf-cell .ix{font-size:9px;color:var(--text-faint);font-weight:400;margin-top:3px}.bf-cell.set{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}.bf-cell.touch{box-shadow:0 0 0 2px var(--accent);transform:translateY(-4px)}.bf-cell.read{border-color:var(--good);color:var(--good);box-shadow:0 0 0 2px var(--good)}.bf-cell.zero{border-color:var(--bad);color:var(--bad);box-shadow:0 0 0 2px var(--bad);transform:translateY(-4px)}.bf-stage{min-height:62px}.teach-q{font-family:var(--font-mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}#bf-code{max-width:100%}</style>"} -->
+<div class="ux-wrap ux-wrap--reading">
+
+  <header>
+    <span class="ux-kicker">Data structures · probabilistic · <span class="ux-strong">TEACH mode</span></span>
+    <h1 class="ux-thesis ux-rise" style="--i:0">A Bloom filter can be <span class="lit">certain</span> that it has never seen a value — while storing none of the values it's seen. How can a <em>no</em> be proof, but a <em>yes</em> only a hunch?</h1>
+    <p class="ux-lede ux-rise" style="--i:1">We'll build one by hand, watch it answer two queries, then you'll predict the tricky case before it's revealed. No prior knowledge beyond "a hash function turns a word into a number."</p>
+  </header>
+
+  <section class="ux-section">
+    <div class="ux-callout">
+      <strong>Hold your current picture for a second.</strong> You probably imagine a set as a list of the things you put in it — to answer "is <code>x</code> in here?" it scans for <code>x</code>. A Bloom filter does something stranger: it <em>throws the values away entirely</em> and keeps only a row of bits. That's why it's tiny — and why it can only ever say "maybe."
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-section-title">Build it by hand</div>
+    <div data-stepper data-code="#bf-code" class="bf-stepper">
+        <pre class="ux-codeblock" id="bf-code"><span class="l"><span class="ln">1</span>bits = [<span class="tok-n">0</span>] * <span class="tok-n">12</span>   <span class="tok-c"># all 0</span></span><span class="l"><span class="ln">2</span><span class="tok-k">def</span> <span class="tok-f">add</span>(x):</span><span class="l"><span class="ln">3</span>    bits[h1(x)] = <span class="tok-n">1</span></span><span class="l"><span class="ln">4</span>    bits[h2(x)] = <span class="tok-n">1</span></span><span class="l"><span class="ln">5</span><span class="tok-k">def</span> <span class="tok-f">maybe</span>(x):</span><span class="l"><span class="ln">6</span>    <span class="tok-k">return</span> bits[h1(x)] <span class="tok-k">and</span> bits[h2(x)]</span></pre>
+        <div class="bf-stage">
+          <div data-step-show="0" class="bf"><span class="bf-cell">0<span class="ix">0</span></span><span class="bf-cell">0<span class="ix">1</span></span><span class="bf-cell">0<span class="ix">2</span></span><span class="bf-cell">0<span class="ix">3</span></span><span class="bf-cell">0<span class="ix">4</span></span><span class="bf-cell">0<span class="ix">5</span></span><span class="bf-cell">0<span class="ix">6</span></span><span class="bf-cell">0<span class="ix">7</span></span><span class="bf-cell">0<span class="ix">8</span></span><span class="bf-cell">0<span class="ix">9</span></span><span class="bf-cell">0<span class="ix">10</span></span><span class="bf-cell">0<span class="ix">11</span></span></div>
+          <div data-step-show="1" hidden class="bf"><span class="bf-cell">0<span class="ix">0</span></span><span class="bf-cell">0<span class="ix">1</span></span><span class="bf-cell set touch">1<span class="ix">2</span></span><span class="bf-cell">0<span class="ix">3</span></span><span class="bf-cell">0<span class="ix">4</span></span><span class="bf-cell">0<span class="ix">5</span></span><span class="bf-cell">0<span class="ix">6</span></span><span class="bf-cell set touch">1<span class="ix">7</span></span><span class="bf-cell">0<span class="ix">8</span></span><span class="bf-cell">0<span class="ix">9</span></span><span class="bf-cell">0<span class="ix">10</span></span><span class="bf-cell">0<span class="ix">11</span></span></div>
+          <div data-step-show="2" hidden class="bf"><span class="bf-cell">0<span class="ix">0</span></span><span class="bf-cell">0<span class="ix">1</span></span><span class="bf-cell set">1<span class="ix">2</span></span><span class="bf-cell">0<span class="ix">3</span></span><span class="bf-cell set touch">1<span class="ix">4</span></span><span class="bf-cell">0<span class="ix">5</span></span><span class="bf-cell">0<span class="ix">6</span></span><span class="bf-cell set touch">1<span class="ix">7</span></span><span class="bf-cell">0<span class="ix">8</span></span><span class="bf-cell">0<span class="ix">9</span></span><span class="bf-cell">0<span class="ix">10</span></span><span class="bf-cell">0<span class="ix">11</span></span></div>
+          <div data-step-show="3" hidden class="bf"><span class="bf-cell">0<span class="ix">0</span></span><span class="bf-cell">0<span class="ix">1</span></span><span class="bf-cell set read">1<span class="ix">2</span></span><span class="bf-cell">0<span class="ix">3</span></span><span class="bf-cell set">1<span class="ix">4</span></span><span class="bf-cell">0<span class="ix">5</span></span><span class="bf-cell">0<span class="ix">6</span></span><span class="bf-cell set read">1<span class="ix">7</span></span><span class="bf-cell">0<span class="ix">8</span></span><span class="bf-cell">0<span class="ix">9</span></span><span class="bf-cell">0<span class="ix">10</span></span><span class="bf-cell">0<span class="ix">11</span></span></div>
+          <div data-step-show="4" hidden class="bf"><span class="bf-cell">0<span class="ix">0</span></span><span class="bf-cell">0<span class="ix">1</span></span><span class="bf-cell set">1<span class="ix">2</span></span><span class="bf-cell">0<span class="ix">3</span></span><span class="bf-cell set read">1<span class="ix">4</span></span><span class="bf-cell">0<span class="ix">5</span></span><span class="bf-cell">0<span class="ix">6</span></span><span class="bf-cell set">1<span class="ix">7</span></span><span class="bf-cell">0<span class="ix">8</span></span><span class="bf-cell zero">0<span class="ix">9</span></span><span class="bf-cell">0<span class="ix">10</span></span><span class="bf-cell">0<span class="ix">11</span></span></div>
+        </div>
+
+        <p class="ux-step-cap teach-q" data-step-cap></p>
+        <div class="ux-stepper">
+          <button data-step="prev" aria-label="Previous step">‹ prev</button>
+          <span data-step-n>1 / 5</span>
+          <button data-step="next" aria-label="Next step">next ›</button>
+          <button data-step="reset" aria-label="Restart">↺</button>
+        </div>
+        <script type="application/json" class="ux-steps">
+          [{"cap":"Start with 12 bits, all 0. Two hash functions, h1 and h2, scatter any word to two positions.","lines":[1]},
+           {"cap":"add('cat') → h1=2, h2=7. Flip those two bits to 1. The word 'cat' itself is never stored.","lines":[2,3,4]},
+           {"cap":"add('dog') → h1=4, h2=7. Bit 7 was already 1 — collisions are fine, we just leave it set.","lines":[2,3,4]},
+           {"cap":"maybe('cat') → read bits 2 and 7. Both are 1 → 'maybe present.' (It was — but the filter only ever sees bits.)","lines":[5,6]},
+           {"cap":"maybe('fox') → h1=4 is 1, but h2=9 is 0. One zero is decisive: 'DEFINITELY not present.' Nothing could have flipped bit 9 back down.","lines":[5,6]}]
+        </script>
+    </div>
+    <div class="ux-grid ux-cols-2" style="margin-top:18px;gap:16px 28px">
+      <aside class="ux-sidenote"><span class="ux-strong">Why two hash functions?</span> One bit per word collides far too often. Real filters use <em>k</em> hashes over <em>m</em> bits; here k=2, m=12 to keep it legible. Step through with <kbd>←</kbd>/<kbd>→</kbd> once the player has focus.</aside>
+      <aside class="ux-sidenote"><span class="ux-strong">The asymmetry to watch.</span> <code>add</code> only ever turns bits <em>on</em> — never off. So a bit still sitting at <em>0</em> proves nothing was ever hashed there. That's the whole trick, and it lands on the next panel.</aside>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-panel ux-panel--focal">
+      <div class="ux-eyebrow">The one idea</div>
+      <p class="ux-h2" style="margin:6px 0 0">A single <span class="lit">0</span> is a proof of absence.</p>
+      <p class="ux-prose" style="margin-top:10px">Because <code>add</code> only ever sets bits to 1, a position that is still 0 can <em>only</em> mean nothing was ever hashed there. So if any of a value's bits is 0, that value was definitely never added. The reverse isn't true: all-ones can happen by accident.</p>
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-section-title">Now you predict</div>
+    <p class="ux-prose">Same filter as the end of the walkthrough — bits 2, 4, and 7 are set. We ask <code>maybe('cow')</code>, where <code>h1('cow')=2</code> and <code>h2('cow')=4</code>. Both of those bits are currently 1.</p>
+    <p class="ux-prose teach-q">Commit to an answer first: what does the filter return, and is it telling the truth?</p>
+    <details class="ux-details">
+      <summary>Reveal the answer</summary>
+      <div class="ux-details__body">
+        <p>It returns <span class="ux-label ux-label--warn">maybe present</span> — both bits are set. But <code>cow</code> was <em>never added</em>. Bits 2 and 4 were turned on by <code>cat</code> and <code>dog</code>; <code>cow</code> just happened to hash onto the same two. This is a <span class="ux-strong">false positive</span>.</p>
+        <p style="margin-top:10px">That's the deal a Bloom filter makes: <span class="ux-strong">it can false-positive, but it can never false-negative.</span> A <em>no</em> is a guarantee. A <em>yes</em> is a strong hint you still have to verify.</p>
+      </div>
+    </details>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-callout ux-callout--good">
+      <strong>Honest analogy.</strong> It's the guest list at the door — <em>but only half of it.</em> "Your name isn't on the list" is final; you're not getting in. "I see your name" still sends you to have your ID checked, because two guests can share a name. The filter is the quick list scan; the real database lookup is the ID check. <span class="ux-strong">Where it breaks:</span> a real guest list can also give a false <em>no</em> (someone forgot to add you) — a Bloom filter never can.
+    </div>
+  </section>
+
+  <section class="ux-section">
+    <div class="ux-section-title">Exit ticket</div>
+    <p class="ux-prose">You put a Bloom filter in front of a slow database so you can skip lookups for keys that don't exist. A query returns "maybe."</p>
+    <p class="ux-prose teach-q">What do you do next — and what did the filter still save you?</p>
+    <details class="ux-details">
+      <summary>Check your answer</summary>
+      <div class="ux-details__body">
+        <p>You do the real database lookup — the "maybe" could be a false positive, so the filter alone can't confirm a hit. What it bought you is every <span class="ux-strong">"definitely not"</span>: those queries skip the database entirely. For a mostly-miss workload (most keys don't exist), that's the bulk of the traffic — which is exactly when a Bloom filter is worth its bits.</p>
+      </div>
+    </details>
+  </section>
+
+</div>
